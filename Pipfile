@@ -1,0 +1,20 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+kac_drumset = {git = "https://github.com/lewiswolf/kac_drumset.git"}
+torch = "*"
+
+[dev-packages]
+flake8 = "*"
+flake8-commas = "*"
+mypy = "*"
+
+[requires]
+python_version = "3.9"
+
+[scripts]
+start = "python index.py"
+test = "sh ./test/test.sh"
