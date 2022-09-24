@@ -10,6 +10,7 @@ torch = "*"
 [dev-packages]
 flake8 = "*"
 flake8-commas = "*"
+graphs = {git = "https://github.com/lewiswolf/graphs.git"}
 mypy = "*"
 
 [requires]
