@@ -8,7 +8,7 @@ case $1 in
     dataset=$1
     ;;
   *)
-	echo "argument 1 is not a valid dataset."
+	echo "Argument 1 is not a valid dataset."
 	exit 0
     ;;
 esac
@@ -25,10 +25,21 @@ cd data
 		echo "$api_token" > $token_file
 	fi
 
-	# clear directory of all files that are not hidden
+	# clear directory of all files that are .gitignore and .zenodo
 	for f in *;
 	do
 		rm -rf $f
+	done
+	for f in .*;
+	do
+		case $f in
+			.|..|.gitignore|.zenodo)
+				continue
+				;;
+			*)
+				rm -rf $f
+				;;
+		esac
 	done
 
 	# download dataset from zenodo

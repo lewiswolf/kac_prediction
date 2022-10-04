@@ -5,17 +5,20 @@ name = "pypi"
 
 [packages]
 kac_drumset = {git = "https://github.com/lewiswolf/kac_drumset.git"}
-torch = "*"
+torch = ">=1.12"
+tqdm = ">=4.64"
+wandb = ">=0.13"
 
 [dev-packages]
 flake8 = "*"
 flake8-commas = "*"
 graphs = {git = "https://github.com/lewiswolf/graphs.git"}
-mypy = "*"
+mypy = ">=0.981"
 
 [requires]
 python_version = "3.9"
 
 [scripts]
+install-sample-pack = "sh ./bin/install.sh 2000-convex-polygon-drums-of-varying-size"
 start = "python index.py"
 test = "sh ./test/test.sh"
