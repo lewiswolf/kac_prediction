@@ -19,6 +19,6 @@ mypy = ">=0.981"
 python_version = "3.9"
 
 [scripts]
-install-sample-pack = "sh ./bin/install.sh 2000-convex-polygon-drums-of-varying-size"
+install-sample-pack = "sh ./bin/install-dataset.sh 2000-convex-polygon-drums-of-varying-size"
 start = "python index.py"
 test = "sh ./test/test.sh"

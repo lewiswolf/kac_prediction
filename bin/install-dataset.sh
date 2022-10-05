@@ -2,7 +2,7 @@
 # This file downloads datasets from the kac_drumset publication: https://zenodo.org/record/7057219
 # It is expected that these datasets will be contained in a directory ./data, which should exist before running this script.
 
-# determine which dataset is to be installed
+# determine which dataset should be installed
 case $1 in
   2000-convex-polygon-drums-of-varying-size)
     dataset=$1
@@ -21,11 +21,11 @@ cd data
 	else 
 		echo "No access token found..."
 		echo "Set one up at https://zenodo.org/account/settings/applications/"
-		read -p "Enter your zenodo access token : " api_token
+		read -p "Enter your zenodo access token: " api_token
 		echo "$api_token" > $token_file
 	fi
 
-	# clear directory of all files that are .gitignore and .zenodo
+	# clear directory of all files that are not .gitignore and .zenodo
 	for f in *;
 	do
 		rm -rf $f
@@ -42,18 +42,14 @@ cd data
 		esac
 	done
 
-	# download dataset from zenodo
+	# download the dataset from zenodo
 	curl --cookie ../.zenodo "https://zenodo.org/record/7057219/files/${dataset}.zip?download=1" --output ${dataset}.zip
 
 	# unzip and copy contents to /data
-	echo "organising files..."
+	echo "Organising files..."
 	unzip -q ${dataset}.zip
 	cp -a ${dataset}/data/. .
 
 	# remove excess files
 	rm -rf ${dataset}
 	rm ${dataset}.zip
-	# and remove any other trash left over
-	if [ -d "__MACOSX" ]; then
-		rm -rf __MACOSX
-	fi
