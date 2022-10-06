@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+annotated-types = ">=0.3"
 kac_drumset = {git = "https://github.com/lewiswolf/kac_drumset.git"}
 torch = ">=1.12"
 tqdm = ">=4.64"

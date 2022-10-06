@@ -1,8 +1,4 @@
-from .pipeline import getEvaluationDataset, getTrainingDatasets, trainModel
-
-
-__all__ = [
-	'getEvaluationDataset',
-	'getTrainingDatasets',
-	'trainModel',
-]
+__all__ = []
+__all__.append('architecture')
+__all__.append('pipeline')
+__all__.append('routine')

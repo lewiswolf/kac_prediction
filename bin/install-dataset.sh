@@ -4,7 +4,7 @@
 
 # determine which dataset should be installed
 case $1 in
-  2000-convex-polygon-drums-of-varying-size)
+  2000-convex-polygon-drums-of-varying-size|5000-circular-drums-of-varying-size)
     dataset=$1
     ;;
   *)

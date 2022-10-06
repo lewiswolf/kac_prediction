@@ -1,9 +1,9 @@
-from .data_loader import getEvaluationDataset, getTrainingDatasets
-from .train import trainModel
+from .data_loader import getEvaluationDataset, getTestingDataset, getTrainingDataset
 
 
 __all__ = [
 	'getEvaluationDataset',
-	'getTrainingDatasets',
-	'trainModel',
+	'getTestingDataset',
+	'getTrainingDataset',
 ]
+__all__.append('types')

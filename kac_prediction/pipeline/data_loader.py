@@ -12,15 +12,17 @@ import torch		# pytorch
 
 # src
 from kac_drumset import TorchDataset
+from .types import DatasetSplit
 
 __all__ = [
 	'inferSubdivisions',
 	'getEvaluationDataset',
-	'getTrainingDatasets',
+	'getTestingDataset',
+	'getTrainingDataset',
 ]
 
 
-def inferSubdivisions(dataset_size: int, split: tuple[float, float, float] = (0.7, 0.15, 0.15)) -> list[int]:
+def inferSubdivisions(dataset_size: int, split: DatasetSplit = (0.7, 0.15, 0.15)) -> list[int]:
 	'''
 	Calculates the integer splits for the training, testing and validation sets.
 	'''
@@ -35,7 +37,7 @@ def inferSubdivisions(dataset_size: int, split: tuple[float, float, float] = (0.
 
 def getEvaluationDataset(
 	dataset: TorchDataset,
-	split: tuple[float, float, float] = (0.7, 0.15, 0.15),
+	split: DatasetSplit = (0.7, 0.15, 0.15),
 ) -> torch.utils.data.DataLoader:
 	'''
 	Extracts the evaluation subset from the dataset, and returns a DataLoader ready
@@ -49,26 +51,35 @@ def getEvaluationDataset(
 	)
 
 
-def getTrainingDatasets(
+def getTestingDataset(
+	dataset: TorchDataset,
+	split: DatasetSplit = (0.7, 0.15, 0.15),
+) -> torch.utils.data.DataLoader:
+	'''
+	Extracts the training subset from the dataset, and returns a DataLoader ready
+	for testing a network.
+	'''
+
+	subdivisions = inferSubdivisions(dataset.__len__(), split)
+	return torch.utils.data.DataLoader(
+		dataset,
+		sampler=torch.utils.data.SubsetRandomSampler(list(range(subdivisions[0], subdivisions[1]))),
+	)
+
+
+def getTrainingDataset(
 	dataset: TorchDataset,
 	batch_size: int,
-	split: tuple[float, float, float] = (0.7, 0.15, 0.15),
-) -> tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader]:
+	split: DatasetSplit = (0.7, 0.15, 0.15),
+) -> torch.utils.data.DataLoader:
 	'''
-	Extracts the training and testing subsets from the dataset, and returns a DataLoader ready
+	Extracts the training subset from the dataset, and returns a DataLoader ready
 	for training a network.
 	'''
 
 	subdivisions = inferSubdivisions(dataset.__len__(), split)
-	return (
-		torch.utils.data.DataLoader(
-			dataset,
-			batch_size=batch_size,
-			sampler=torch.utils.data.SubsetRandomSampler(list(range(0, subdivisions[0]))),
-		),
-		torch.utils.data.DataLoader(
-			dataset,
-			batch_size=batch_size,
-			sampler=torch.utils.data.SubsetRandomSampler(list(range(subdivisions[0], subdivisions[1]))),
-		),
+	return torch.utils.data.DataLoader(
+		dataset,
+		batch_size=batch_size,
+		sampler=torch.utils.data.SubsetRandomSampler(list(range(0, subdivisions[0]))),
 	)
