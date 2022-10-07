@@ -1,5 +1,5 @@
 '''
-This file is used to prepare a dataset for multiple purposes. Given a threeway split,
+This file is used to prepare a dataset for multiple purposes. Given a three-way split,
 this file will return three subsets prepared for either training, testing or evaluating
 a neural network.
 '''
@@ -12,7 +12,6 @@ import torch		# pytorch
 
 # src
 from kac_drumset import TorchDataset
-from .types import DatasetSplit
 
 __all__ = [
 	'inferSubdivisions',
@@ -22,7 +21,7 @@ __all__ = [
 ]
 
 
-def inferSubdivisions(dataset_size: int, split: DatasetSplit = (0.7, 0.15, 0.15)) -> list[int]:
+def inferSubdivisions(dataset_size: int, split: tuple[float, float, float] = (0.7, 0.15, 0.15)) -> list[int]:
 	'''
 	Calculates the integer splits for the training, testing and validation sets.
 	'''
@@ -37,7 +36,7 @@ def inferSubdivisions(dataset_size: int, split: DatasetSplit = (0.7, 0.15, 0.15)
 
 def getEvaluationDataset(
 	dataset: TorchDataset,
-	split: DatasetSplit = (0.7, 0.15, 0.15),
+	split: tuple[float, float, float] = (0.7, 0.15, 0.15),
 ) -> torch.utils.data.DataLoader:
 	'''
 	Extracts the evaluation subset from the dataset, and returns a DataLoader ready
@@ -53,7 +52,7 @@ def getEvaluationDataset(
 
 def getTestingDataset(
 	dataset: TorchDataset,
-	split: DatasetSplit = (0.7, 0.15, 0.15),
+	split: tuple[float, float, float] = (0.7, 0.15, 0.15),
 ) -> torch.utils.data.DataLoader:
 	'''
 	Extracts the training subset from the dataset, and returns a DataLoader ready
@@ -70,7 +69,7 @@ def getTestingDataset(
 def getTrainingDataset(
 	dataset: TorchDataset,
 	batch_size: int,
-	split: DatasetSplit = (0.7, 0.15, 0.15),
+	split: tuple[float, float, float] = (0.7, 0.15, 0.15),
 ) -> torch.utils.data.DataLoader:
 	'''
 	Extracts the training subset from the dataset, and returns a DataLoader ready

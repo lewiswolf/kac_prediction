@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-annotated-types = ">=0.3"
 kac_drumset = {git = "https://github.com/lewiswolf/kac_drumset.git"}
 torch = ">=1.12"
 tqdm = ">=4.64"
@@ -15,11 +14,11 @@ flake8 = "*"
 flake8-commas = "*"
 graphs = {git = "https://github.com/lewiswolf/graphs.git"}
 mypy = ">=0.981"
+types-pyyaml = "*"
 
 [requires]
-python_version = "3.9"
+python_version = "3.10"
 
 [scripts]
-install-sample-pack = "sh ./bin/install-dataset.sh 2000-convex-polygon-drums-of-varying-size"
 start = "python index.py"
 test = "sh ./test/test.sh"
