@@ -184,6 +184,7 @@ with tqdm(bar_format=bar_format, total=P['num_of_epochs'], unit='epochs') as epo
 						y = y['drum_size'].to(device)
 						y_hat = model(x)
 						testing_loss += criterion(y_hat, y).item()
+						t_bar.update(1)
 
 				# calculate overall loss
 				testing_loss /= len(testing_dataset)
@@ -217,5 +218,5 @@ with tqdm(bar_format=bar_format, total=P['num_of_epochs'], unit='epochs') as epo
 				if torch.cuda.is_available():
 					torch.cuda.empty_cache()
 				epoch_bar.update(1)
-				if args.wandb:
-					wandb.finish()
+if args.wandb:
+	wandb.finish()
