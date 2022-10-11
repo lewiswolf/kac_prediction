@@ -9,7 +9,7 @@ import random
 # import shlex
 import string
 # import subprocess
-from typing import Any, Literal, TypedDict
+from typing import Any, Literal, Optional, TypedDict
 import yaml
 
 # dependencies
@@ -143,7 +143,7 @@ if args.wandb:
 criterion = torch.nn.MSELoss()
 
 # configure optimiser
-optimiser: torch.optim.Optimizer | None = None
+optimiser: Optional[torch.optim.Optimizer] = None
 if P['optimiser'] == 'adam':
 	optimiser = torch.optim.Adam(model.parameters(), lr=P['learning_rate'])
 elif P['optimiser'] == 'sgd':
@@ -200,7 +200,7 @@ with tqdm(bar_format=bar_format, total=P['num_of_epochs'], unit='epochs') as epo
 					}, commit=True)
 					# save model
 					wandb.save(
-						os.path.join(run['model_dir'], f'epoch_{epoch}.Model'),
+						os.path.join(run['model_dir'], f'epoch_{epoch}.model'),
 						run['model_dir'],
 					)
 				else:
@@ -209,10 +209,12 @@ with tqdm(bar_format=bar_format, total=P['num_of_epochs'], unit='epochs') as epo
 						os.makedirs(run['model_dir'])
 					torch.save({
 						'epoch': epoch,
-						'loss': loss,
+						'evaluation_loss': testing_loss if not P['testing'] else None,
 						'model_state_dict': model.state_dict(),
 						'optimizer_state_dict': optimiser.state_dict(),
-					}, f'{run["model_dir"]}/epoch_{epoch}.Model')
+						'testing_loss': testing_loss if P['testing'] else None,
+						'training_loss': training_loss,
+					}, f'{run["model_dir"]}/epoch_{epoch}.model')
 
 				# cleanup
 				if torch.cuda.is_available():
