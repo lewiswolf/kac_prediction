@@ -1,0 +1,26 @@
+program: index.py
+method: random
+project: kac_prediction (circular drum size)
+command:
+- ${env} 
+- pipenv run
+- ${program}
+- ${args}
+
+metric:
+  name: accuracy
+  goal: maximize
+parameters:
+  batch_size:
+    values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 16, 24, 32, 64]
+  dropout:
+    min: 0.0001
+    max: 0.5
+  learning_rate:
+    min: 0.0001
+    max: 0.1
+  num_of_epochs:
+    values: 100
+  optimised:
+    values: ['adam', 'sgd']
+    
