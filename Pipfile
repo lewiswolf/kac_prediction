@@ -6,15 +6,15 @@ name = "pypi"
 [packages]
 kac_drumset = {git = "https://github.com/lewiswolf/kac_drumset.git"}
 torch = ">=1.12"
-tqdm = ">=4.64"
-wandb = ">=0.13"
 
 [dev-packages]
 flake8 = "*"
 flake8-commas = "*"
-graphs = {git = "https://github.com/lewiswolf/graphs.git"}
+kac_prediction = {editable = true, path = "."}
 mypy = ">=0.981"
+tqdm = "*"
 types-pyyaml = "*"
+wandb = "*"
 
 [requires]
 python_version = "3.9"

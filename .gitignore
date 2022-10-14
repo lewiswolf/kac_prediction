@@ -1,6 +1,12 @@
-.DS_Store
+# directories
+*.egg-info
 .mypy_cache
-Pipfile.lock
+__pycache__
+/build
 /model
 /unused
 /wandb
+
+# files
+.DS_Store
+Pipfile.lock

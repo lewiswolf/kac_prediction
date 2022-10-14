@@ -1,2 +1,3 @@
-__all__ = []
-__all__.append('size_of_circular_drum')
+from .size_of_circular_drum import SizeOfCircularDrum
+
+__all__ = ['SizeOfCircularDrum']
