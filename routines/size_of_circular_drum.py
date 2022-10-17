@@ -3,6 +3,7 @@ Full training and evaluation routine for the SizeOfCircularDrum model.
 '''
 
 # core
+import math
 import os
 import random
 # import shlex
@@ -191,6 +192,8 @@ def train(config: Optional[str] = None, using_wandb: bool = False) -> None:
 					# calculate overall loss
 					testing_loss /= len(testing_dataset)
 					training_loss /= len(training_dataset)
+					assert not math.isnan(testing_loss)
+					assert not math.isnan(training_loss)
 
 					if using_wandb:
 						# logs
