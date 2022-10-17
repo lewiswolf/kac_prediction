@@ -1,7 +1,6 @@
 '''
-This file is used to prepare a dataset for multiple purposes. Given a three-way split,
-this file will return three subsets prepared for either training, testing or evaluating
-a neural network.
+This file is used to prepare a dataset for multiple purposes. Given a three-way split, this file will return three
+subsets prepared for either training, testing or evaluating a neural network.
 '''
 
 # core
@@ -36,32 +35,34 @@ def inferSubdivisions(dataset_size: int, split: tuple[float, float, float] = (0.
 
 def getEvaluationDataset(
 	dataset: TorchDataset,
+	batch_size: int,
 	split: tuple[float, float, float] = (0.7, 0.15, 0.15),
 ) -> torch.utils.data.DataLoader:
 	'''
-	Extracts the evaluation subset from the dataset, and returns a DataLoader ready
-	for evaluating a network.
+	Extracts the evaluation subset from the dataset, and returns a DataLoader ready for evaluating a network.
 	'''
 
 	subdivisions = inferSubdivisions(dataset.__len__(), split)
 	return torch.utils.data.DataLoader(
 		dataset,
+		batch_size=batch_size,
 		sampler=torch.utils.data.SubsetRandomSampler(list(range(subdivisions[1], subdivisions[2]))),
 	)
 
 
 def getTestingDataset(
 	dataset: TorchDataset,
+	batch_size: int,
 	split: tuple[float, float, float] = (0.7, 0.15, 0.15),
 ) -> torch.utils.data.DataLoader:
 	'''
-	Extracts the training subset from the dataset, and returns a DataLoader ready
-	for testing a network.
+	Extracts the training subset from the dataset, and returns a DataLoader ready for testing a network.
 	'''
 
 	subdivisions = inferSubdivisions(dataset.__len__(), split)
 	return torch.utils.data.DataLoader(
 		dataset,
+		batch_size=batch_size,
 		sampler=torch.utils.data.SubsetRandomSampler(list(range(subdivisions[0], subdivisions[1]))),
 	)
 
@@ -72,8 +73,7 @@ def getTrainingDataset(
 	split: tuple[float, float, float] = (0.7, 0.15, 0.15),
 ) -> torch.utils.data.DataLoader:
 	'''
-	Extracts the training subset from the dataset, and returns a DataLoader ready
-	for training a network.
+	Extracts the training subset from the dataset, and returns a DataLoader ready for training a network.
 	'''
 
 	subdivisions = inferSubdivisions(dataset.__len__(), split)

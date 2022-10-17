@@ -121,7 +121,13 @@ def train(config: Optional[str] = None, using_wandb: bool = False) -> None:
 		else:
 			raise e
 	training_dataset = getTrainingDataset(dataset, batch_size=P['batch_size'])
-	testing_dataset = getTestingDataset(dataset) if P['testing'] else getEvaluationDataset(dataset)
+	testing_dataset = getTestingDataset(
+		dataset,
+		batch_size=P['batch_size'],
+	) if P['testing'] else getEvaluationDataset(
+		dataset,
+		batch_size=P['batch_size'],
+	)
 
 	# configure device
 	if torch.cuda.is_available():
@@ -148,9 +154,9 @@ def train(config: Optional[str] = None, using_wandb: bool = False) -> None:
 	# loops
 	printEmojis('Training neural network... 🧠')
 	bar_format: str = '{percentage:3.0f}% |{bar}| {n_fmt}/{total_fmt}, Elapsed: {elapsed}, ETA: {remaining}, {rate_fmt} '
-	with tqdm(bar_format=bar_format, total=P['num_of_epochs'], unit='epochs') as epoch_bar:
-		with tqdm(bar_format=bar_format, total=len(training_dataset), unit='batches') as i_bar:
-			with tqdm(bar_format=bar_format, total=len(testing_dataset), unit='samples') as t_bar:
+	with tqdm(bar_format=bar_format, total=P['num_of_epochs'], unit='  epochs') as epoch_bar:
+		with tqdm(bar_format=bar_format, total=len(training_dataset), unit=' batches') as i_bar:
+			with tqdm(bar_format=bar_format, total=len(testing_dataset), unit=' batches') as t_bar:
 				for epoch in range(P['num_of_epochs']):
 
 					# initialise ux and loss
