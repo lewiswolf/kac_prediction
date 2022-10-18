@@ -62,7 +62,7 @@ def train(config: Optional[str] = None, using_wandb: bool = False) -> None:
 	# initialise default hyper parameters
 	P: ModelHyperParameters = {
 		'batch_size': Y['batch_size'] if 'batch_size' in Y else 5,
-		'depth': 'tiny',
+		'depth': Y['depth'] if 'depth' in Y else 'tiny',
 		'dropout': Y['dropout'] if 'dropout' in Y else 0.25,
 		'learning_rate': Y['learning_rate'] if 'learning_rate' in Y else 1e-3,
 		'num_of_epochs': Y['num_of_epochs'] if 'num_of_epochs' in Y else 100,
