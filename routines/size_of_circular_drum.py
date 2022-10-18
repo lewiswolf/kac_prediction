@@ -121,6 +121,10 @@ def train(config: Optional[str] = None, using_wandb: bool = False) -> None:
 			)
 		else:
 			raise e
+
+	# format dataset
+	dataset.X = torch.narrow(dataset.X, 1, 0, 1024)
+	dataset.Y = torch.tensor([y['drum_size'] for y in dataset.Y])
 	training_dataset = getTrainingDataset(dataset, batch_size=P['batch_size'])
 	testing_dataset = getTestingDataset(
 		dataset,
@@ -170,7 +174,7 @@ def train(config: Optional[str] = None, using_wandb: bool = False) -> None:
 					model.train()
 					for i, (x, y) in enumerate(training_dataset):
 						x = x.to(device)
-						y = y['drum_size'].to(device)
+						y = y.to(device)
 						y_hat = model(x)
 						loss = criterion(y_hat, y)
 						loss.backward()
@@ -184,7 +188,7 @@ def train(config: Optional[str] = None, using_wandb: bool = False) -> None:
 					with torch.no_grad():
 						for t, (x, y) in enumerate(testing_dataset):
 							x = x.to(device)
-							y = y['drum_size'].to(device)
+							y = y.to(device)
 							y_hat = model(x)
 							testing_loss += criterion(y_hat, y).item()
 							t_bar.update(1)

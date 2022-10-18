@@ -2,6 +2,6 @@ batch_size: 5
 depth: 'large'
 dropout: 0.085
 learning_rate: 0.00025
-num_of_epochs: 200
+num_of_epochs: 100
 optimiser: 'adam'
 testing': True

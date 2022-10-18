@@ -84,7 +84,8 @@ class SizeOfCircularDrum(torch.nn.Module):
 	def forward(self, x: torch.Tensor) -> torch.Tensor:
 		''' Forward pass. '''
 
-		x = x[:, :1024].view(x.shape[0], 1, -1, 1)
+		assert x.shape[1] == 1024
+		x = x.view(x.shape[0], 1, -1, 1)
 		for layer in self.conv_layers:
 			x = layer(x)
 		x = x.permute(0, 3, 2, 1)
