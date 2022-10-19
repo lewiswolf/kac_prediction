@@ -148,6 +148,8 @@ def train(config: Optional[str] = None, using_wandb: bool = False) -> None:
 
 	# configure criterion
 	criterion = torch.nn.MSELoss()
+	test_loss_arr: list[float] = []
+	test_loss_min: float = 1.
 
 	# configure optimiser
 	optimiser: Optional[torch.optim.Optimizer] = None
@@ -162,7 +164,8 @@ def train(config: Optional[str] = None, using_wandb: bool = False) -> None:
 	with tqdm(bar_format=bar_format, total=P['num_of_epochs'], unit='  epochs') as epoch_bar:
 		with tqdm(bar_format=bar_format, total=len(training_dataset), unit=' batches') as i_bar:
 			with tqdm(bar_format=bar_format, total=len(testing_dataset), unit=' batches') as t_bar:
-				for epoch in range(P['num_of_epochs']):
+				epoch = 0
+				while P['num_of_epochs'] == 0 or epoch < P['num_of_epochs']:
 
 					# initialise ux and loss
 					i_bar.reset()
@@ -227,7 +230,19 @@ def train(config: Optional[str] = None, using_wandb: bool = False) -> None:
 					# cleanup
 					if torch.cuda.is_available():
 						torch.cuda.empty_cache()
+
+					# early stopping
+					test_loss_arr.append(testing_loss)
+					test_loss_arr = test_loss_arr[-32:]
+					test_loss_min = min(test_loss_min, testing_loss)
+					if (min(test_loss_arr) > test_loss_min):
+						break
+
+					# progress bar
 					epoch_bar.update(1)
+					epoch += 1
+
+	# close wandb
 	if using_wandb:
 		wandb.finish()
 
