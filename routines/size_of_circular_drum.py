@@ -201,23 +201,19 @@ def train(config: Optional[str] = None, using_wandb: bool = False) -> None:
 					training_loss /= len(training_dataset)
 					assert not math.isnan(training_loss)
 
+					# logs
 					if using_wandb:
-						# logs
 						wandb.log({
 							'epoch': epoch,
 							'evaluation_loss': testing_loss if not P['testing'] else None,
 							'testing_loss': testing_loss if P['testing'] else None,
 							'training_loss': training_loss,
 						}, commit=True)
-						# save model
-						wandb.save(
-							os.path.join(run['model_dir'], f'epoch_{epoch}.model'),
-							run['model_dir'],
-						)
-					else:
-						# save model locally
-						if epoch == 0 and not os.path.isdir(run['model_dir']):
-							os.makedirs(run['model_dir'])
+
+					# save model
+					if epoch == 0 and not os.path.isdir(run['model_dir']):
+						os.makedirs(run['model_dir'])
+					if epoch > 50:
 						torch.save({
 							'epoch': epoch,
 							'evaluation_loss': testing_loss if not P['testing'] else None,
@@ -226,6 +222,12 @@ def train(config: Optional[str] = None, using_wandb: bool = False) -> None:
 							'testing_loss': testing_loss if P['testing'] else None,
 							'training_loss': training_loss,
 						}, f'{run["model_dir"]}/epoch_{epoch}.model')
+						if using_wandb:
+							# upload model
+							wandb.save(
+								os.path.join(run['model_dir'], f'epoch_{epoch}.model'),
+								run['model_dir'],
+							)
 
 					# cleanup
 					if torch.cuda.is_available():
