@@ -124,7 +124,7 @@ def train(config: Optional[str] = None, using_wandb: bool = False) -> None:
 
 	# format dataset
 	dataset.X = torch.narrow(dataset.X, 1, 0, 1024)
-	dataset.Y = torch.tensor([[y['drum_size']] for y in dataset.Y])
+	dataset.Y = torch.tensor([[y['drum_size']] for y in dataset.Y]) # type: ignore
 	training_dataset = getTrainingDataset(dataset, batch_size=P['batch_size'])
 	testing_dataset = getTestingDataset(
 		dataset,
