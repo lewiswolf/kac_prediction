@@ -35,7 +35,7 @@ from kac_prediction.pipeline import (
 	getTestingDataset,
 	getTrainingDataset,
 )
-from kac_prediction.pipeline.types import RunInfo
+from kac_prediction.pipeline.types import ExportedModel, RunInfo
 
 
 # types
@@ -71,7 +71,7 @@ def train(config: Optional[str] = None, using_wandb: bool = False) -> None:
 	}
 
 	# initialise a local run as default
-	i_d = ''.join(random.choice(string.ascii_letters) for x in range(10))
+	i_d: str = ''.join(random.choice(string.ascii_letters) for x in range(10))
 	run: RunInfo = {
 		'id': i_d,
 		'model_dir': os.path.normpath(f'{os.path.dirname(__file__)}/../model/run_{i_d}'),
@@ -213,15 +213,20 @@ def train(config: Optional[str] = None, using_wandb: bool = False) -> None:
 					# save model
 					if epoch == 0 and not os.path.isdir(run['model_dir']):
 						os.makedirs(run['model_dir'])
-					if epoch > 50:
-						torch.save({
+					if epoch < 50:
+						torch.save(ExportedModel({
 							'epoch': epoch,
 							'evaluation_loss': testing_loss if not P['testing'] else None,
 							'model_state_dict': model.state_dict(),
+							'model_args': {
+								'depth': P['depth'],
+								'dropout': P['dropout'],
+							},
+							'model_kwargs': {},
 							'optimizer_state_dict': optimiser.state_dict(),
 							'testing_loss': testing_loss if P['testing'] else None,
 							'training_loss': training_loss,
-						}, f'{run["model_dir"]}/epoch_{epoch}.model')
+						}), f'{run["model_dir"]}/epoch_{epoch}.model')
 						if using_wandb:
 							# upload model
 							wandb.save(
