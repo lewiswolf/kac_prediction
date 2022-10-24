@@ -11,6 +11,9 @@ from typing import Optional
 # dependencies
 import torch
 
+# src
+from .types import ExportedModel
+
 __all__ = ['loadModel']
 
 
@@ -26,7 +29,7 @@ def loadModel(Model: type[torch.nn.Module], path_to_parameters: str, url: Option
 		assert url is not None, 'Model parameters could not be located, either locally or using a specified url.'
 		subprocess.run(shlex.split(f'curl {url} -L --output {path_to_parameters}'))
 	# load parameters
-	params = torch.load(path_to_parameters, map_location='cpu')
+	params: ExportedModel = torch.load(path_to_parameters, map_location='cpu')
 	# load model
 	m = Model(*params['model_args'].values(), **params['model_kwargs'])
 	m.load_state_dict(params['model_state_dict'])
