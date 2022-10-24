@@ -17,7 +17,7 @@ __all__ = [
 # Probability: TypeAlias = Annotated[float, lambda x: x >= 0. and x <= 1.]
 
 class ExportedModel(TypedDict, total=True):
-	''' All the info needed to save a model. '''
+	''' All the info needed to save and load a model. '''
 	epoch: int								# current epoch
 	evaluation_loss: Union[float, None]		# current evaluation loss, if not a test model
 	model_state_dict: dict[str, Any]		# model parameters

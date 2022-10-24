@@ -15,7 +15,10 @@ __all__ = ['loadModel']
 
 
 def loadModel(Model: type[torch.nn.Module], path_to_parameters: str, url: Optional[str] = None) -> torch.nn.Module:
-	''' Load and initialise a model. '''
+	'''
+	This method checks first if the model parameters exist at the specified path, if not they are downloaded from the
+	specified url. Finally, a model is loaded and initialised.
+	'''
 
 	# download parameters using curl
 	# could change this to `pip install wget` if this doesn't work on all os
