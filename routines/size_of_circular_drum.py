@@ -200,7 +200,7 @@ def train(config: Optional[str] = None, using_wandb: bool = False) -> None:
 							y_hat = model(x)
 							testing_loss += criterion(y_hat, y).item()
 							if t == 0:
-								plot_data = (y.detach().numpy()[0], y_hat.detach().numpy()[0])
+								plot_data = (y.detach().cpu().numpy()[0], y_hat.detach().cpu().numpy()[0])
 							t_bar.update(1)
 
 					# calculate overall loss
