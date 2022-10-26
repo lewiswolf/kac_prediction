@@ -8,6 +8,7 @@ kac_drumset = {git = "https://github.com/lewiswolf/kac_drumset.git"}
 torch = ">=1.12"
 
 [dev-packages]
+bokeh = "*"
 flake8 = "*"
 flake8-commas = "*"
 kac_prediction = {editable = true, path = "."}

@@ -13,9 +13,13 @@ from typing import Any, Literal, Optional, TypedDict
 import yaml
 
 # dependencies
-import torch			# pytorch
-from tqdm import tqdm	# progress bar
-import wandb			# experiment tracking
+from bokeh.embed import file_html	# convert plot to html
+from bokeh.layouts import row		# align multiple plots horizontally
+from bokeh.plotting import figure	# plot a figure
+from bokeh.resources import CDN		# minified bokeh
+import torch						# pytorch
+from tqdm import tqdm				# progress bar
+import wandb						# experiment tracking
 
 # src
 from kac_drumset import (
@@ -188,12 +192,15 @@ def train(config: Optional[str] = None, using_wandb: bool = False) -> None:
 
 					# evaluation / testing
 					model.eval()
+					plot_data: tuple[float, float] = (0., 0.)
 					with torch.no_grad():
 						for t, (x, y) in enumerate(testing_dataset):
 							x = x.to(device)
 							y = y.to(device)
 							y_hat = model(x)
 							testing_loss += criterion(y_hat, y).item()
+							if t == 0:
+								plot_data = (y.detach().numpy()[0], y_hat.detach().numpy()[0])
 							t_bar.update(1)
 
 					# calculate overall loss
@@ -201,9 +208,22 @@ def train(config: Optional[str] = None, using_wandb: bool = False) -> None:
 					training_loss /= len(training_dataset)
 					assert not math.isnan(training_loss)
 
-					# logs
+					# send to wandb
 					if using_wandb:
+						# plots
+						truth_fig = figure(plot_height=300, plot_width=300, title='Ground Truth')
+						pred_fig = figure(plot_height=300, plot_width=300, title='Prediction')
+						plot_settings = {
+							'fill_color': '#1B9E31',
+							'line_color': '#126B21',
+							'x': 0.,
+							'y': 0.,
+						}
+						truth_fig.circle(radius=plot_data[0] / 2, **plot_settings)
+						pred_fig.circle(radius=plot_data[1] / 2, **plot_settings)
+						# logs
 						wandb.log({
+							'drum_example': wandb.Html(file_html(row(truth_fig, pred_fig), CDN, 'Drum Example.')),
 							'epoch': epoch,
 							'evaluation_loss': testing_loss if not P['testing'] else None,
 							'testing_loss': testing_loss if P['testing'] else None,
