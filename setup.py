@@ -48,7 +48,8 @@ with codecs.open(os.path.join(this, 'Pipfile'), encoding='utf-8') as raw_pipfile
 				packages.append(f'{pkg_name}{spec[0][1:-1]}')
 
 setup(
-	author='Lewis Wolf',
+	author='Lewis Wolstanholme',
+	author_email='lewiswolstanholme@gmail.com',
 	classifiers=[
 		'Operating System :: MacOS :: MacOS X',
 		'Operating System :: Microsoft :: Windows',
