@@ -233,7 +233,7 @@ def train(config: Optional[str] = None, using_wandb: bool = False) -> None:
 					# save model
 					if epoch == 0 and not os.path.isdir(run['model_dir']):
 						os.makedirs(run['model_dir'])
-					if epoch < 50:
+					if epoch > 50:
 						torch.save(ExportedModel({
 							'epoch': epoch,
 							'evaluation_loss': testing_loss if not P['testing'] else None,
