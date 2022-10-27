@@ -259,11 +259,11 @@ def train(config: Optional[str] = None, using_wandb: bool = False) -> None:
 						torch.cuda.empty_cache()
 
 					# early stopping
-					test_loss_arr.append(testing_loss)
-					test_loss_arr = test_loss_arr[-32:]
 					test_loss_min = min(test_loss_min, testing_loss)
 					if (min(test_loss_arr) > test_loss_min):
 						break
+					test_loss_arr.append(testing_loss)
+					test_loss_arr = test_loss_arr[-32:]
 
 					# progress bar
 					epoch_bar.update(1)
