@@ -246,11 +246,11 @@ def train(config: Optional[str] = None, using_wandb: bool = False) -> None:
 							'optimizer_state_dict': optimiser.state_dict(),
 							'testing_loss': testing_loss if P['testing'] else None,
 							'training_loss': training_loss,
-						}), f'{run["model_dir"]}/epoch_{epoch}.model')
+						}), f'{run["model_dir"]}/epoch_{epoch}.pth')
 						if using_wandb:
 							# upload model
 							wandb.save(
-								os.path.join(run['model_dir'], f'epoch_{epoch}.model'),
+								os.path.join(run['model_dir'], f'epoch_{epoch}.pth'),
 								run['model_dir'],
 							)
 
@@ -259,11 +259,11 @@ def train(config: Optional[str] = None, using_wandb: bool = False) -> None:
 						torch.cuda.empty_cache()
 
 					# early stopping
+					test_loss_arr.append(testing_loss)
+					test_loss_arr = test_loss_arr[-32:]
 					test_loss_min = min(test_loss_min, testing_loss)
 					if (min(test_loss_arr) > test_loss_min):
 						break
-					test_loss_arr.append(testing_loss)
-					test_loss_arr = test_loss_arr[-32:]
 
 					# progress bar
 					epoch_bar.update(1)
