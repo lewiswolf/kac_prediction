@@ -15,6 +15,7 @@ kac_prediction = {editable = true, path = "."}
 mypy = ">=0.981"
 tqdm = "*"
 types-pyyaml = "*"
+types-tqdm = "*"
 wandb = "*"
 
 [requires]
