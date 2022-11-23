@@ -4,7 +4,9 @@
 
 # determine which dataset should be installed
 case $1 in
-  2000-convex-polygon-drums-of-varying-size|5000-circular-drums-of-varying-size)
+  2000-convex-polygonal-drums-of-varying-size|
+  5000-circular-drums-of-varying-size|
+  5000-rectangular-drums-of-varying-dimension)
     dataset=$1
     ;;
   *)
@@ -43,7 +45,7 @@ cd data
 	done
 
 	# download the dataset from zenodo
-	curl --cookie ../.zenodo "https://zenodo.org/record/7057219/files/${dataset}.zip?download=1" --output ${dataset}.zip
+	curl --cookie ../.zenodo "https://zenodo.org/record/7274474/files/${dataset}.zip?download=1" --output ${dataset}.zip
 
 	# unzip and copy contents to /data
 	echo "Organising files..."
