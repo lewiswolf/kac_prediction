@@ -15,6 +15,7 @@ kac_prediction = {editable = true, path = "."}
 mypy = "*"
 tqdm = "*"
 types-pyyaml = "*"
+types-setuptools = "*"
 types-tqdm = "*"
 wandb = "*"
 
