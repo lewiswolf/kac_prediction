@@ -12,7 +12,7 @@ bokeh = "*"
 flake8 = "*"
 flake8-commas = "*"
 kac_prediction = {editable = true, path = "."}
-mypy = ">=0.981"
+mypy = "*"
 tqdm = "*"
 types-pyyaml = "*"
 types-tqdm = "*"
