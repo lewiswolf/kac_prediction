@@ -7,7 +7,7 @@ CRePE model for fundamental frequency detection.
 from typing import Literal
 
 # dependencies
-import torch						# pytorch
+import torch
 
 __all__ = ['SizeOfCircularDrum']
 

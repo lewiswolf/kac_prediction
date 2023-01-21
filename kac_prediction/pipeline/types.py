@@ -3,9 +3,11 @@ Utility types used throughout this code base.
 '''
 
 # core
-from typing import Any, TypedDict, Union
+from typing import Any, Literal, TypedDict, Union
+from typing_extensions import TypeAlias
 
 __all__ = [
+	'Datasets',
 	'ExportedModel',
 	'RunInfo',
 ]
@@ -15,6 +17,14 @@ __all__ = [
 # DatasetSplit: TypeAlias = Annotated[tuple[float, float, float], lambda x: sum(x) == 1.]
 # A probability value ∈ [0., 1.]
 # Probability: TypeAlias = Annotated[float, lambda x: x >= 0. and x <= 1.]
+
+# string literals for installing datasets
+Datasets: TypeAlias = Literal[
+	'2000-convex-polygonal-drums-of-varying-size',
+	'5000-circular-drums-of-varying-size',
+	'5000-rectangular-drums-of-varying-dimension',
+]
+
 
 class ExportedModel(TypedDict, total=True):
 	''' All the info needed to save and load a model. '''
