@@ -11,7 +11,7 @@ from setuptools import setup
 this = os.path.abspath(os.path.dirname(__file__))
 name = 'kac_prediction'
 version = '0.0.1'
-short_description = 'Analysis tools and a dataset generator for arbitrarily shaped drums.'
+short_description = 'Neural networks designed for working with arbitrarily shaped drums.'
 
 # import long description from readme.md
 with codecs.open(os.path.join(this, 'readme.md'), encoding='utf-8') as readme:
@@ -19,7 +19,7 @@ with codecs.open(os.path.join(this, 'readme.md'), encoding='utf-8') as readme:
 
 # import packages from Pipfile
 with codecs.open(os.path.join(this, 'Pipfile'), encoding='utf-8') as raw_pipfile:
-	packages: list[str] = []
+	packages = []
 	# read the Pipfile
 	pipfile = raw_pipfile.readlines(1)
 	raw_pipfile.close()
@@ -31,12 +31,8 @@ with codecs.open(os.path.join(this, 'Pipfile'), encoding='utf-8') as raw_pipfile
 			continue
 		# find [packages]
 		if line[0] == '[':
-			if line == '[packages]':
-				is_pkg = True
-				continue
-			else:
-				is_pkg = False
-				continue
+			is_pkg = line == '[packages]'
+			continue
 		# append package names with required version / git config
 		if is_pkg:
 			pkg_name, _, *spec = line.split()
@@ -58,6 +54,7 @@ setup(
 		'Programming Language :: Python :: 3 :: Only',
 		'Programming Language :: Python :: 3.9',
 		'Programming Language :: Python :: 3.10',
+		'Programming Language :: Python :: 3.11',
 		'Typing :: Typed',
 	],
 	description=short_description,

@@ -4,8 +4,8 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-kac_drumset = {git = "https://github.com/lewiswolf/kac_drumset.git"}
-torch = ">=1.12"
+kac-drumset = {git = "https://github.com/lewiswolf/kac_drumset.git"}
+torch = ">=2.0"
 
 [dev-packages]
 bokeh = "*"
