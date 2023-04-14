@@ -4,20 +4,31 @@ CRePE model for fundamental frequency detection.
 '''
 
 # core
-from typing import Literal
+from functools import cached_property
+from typing import Literal, Union
 
 # dependencies
 import torch
 
-__all__ = ['SizeOfCircularDrum']
+# src
+from ..pipeline.types import Parameters
+
+__all__ = ['CRePE']
 
 
-class SizeOfCircularDrum(torch.nn.Module):
+class CRePE(torch.nn.Module):
 	'''
-	A remake of CRePE, a deep CNN for pitch detection, here used for estimation of the size of a drum.
+	A remake of CRePE, a deep CNN for pitch detection.
 	Source: https://github.com/marl/crepe
 	DOI: https://doi.org/10.48550/arXiv.1802.06182
 	'''
+
+	class ModelHyperParameters(Parameters):
+		''' Hyper parameters for this specific model. '''
+		depth: Literal['large', 'medium', 'small', 'tiny']
+		dropout: float
+		learning_rate: float
+		optimiser: Literal['adam', 'sgd']
 
 	class ConvLayer(torch.nn.Module):
 		'''
@@ -54,7 +65,14 @@ class SizeOfCircularDrum(torch.nn.Module):
 			''' Forward pass. '''
 			return self.dropout(self.pool(self.bn(self.relu(self.conv2d(self.pad(x))))))
 
-	def __init__(self, depth: Literal['large', 'medium', 'small', 'tiny'], dropout: float) -> None:
+	def __init__(
+		self,
+		depth: Literal['large', 'medium', 'small', 'tiny'],
+		dropout: float,
+		lr: float,
+		optimiser: Literal['adam', 'sgd'],
+		outputs: int,
+	) -> None:
 		'''
 		Initialise CRePE model.
 		params:
@@ -79,7 +97,10 @@ class SizeOfCircularDrum(torch.nn.Module):
 			) for n in range(6)],
 		)
 		# fully connected layer
-		self.linear = torch.nn.Linear(64 * capacity_multiplier, 1)
+		self.linear = torch.nn.Linear(64 * capacity_multiplier, outputs)
+		# optimiser
+		self.lr = lr
+		self.__optimiser = optimiser
 
 	def forward(self, x: torch.Tensor) -> torch.Tensor:
 		''' Forward pass. '''
@@ -92,3 +113,22 @@ class SizeOfCircularDrum(torch.nn.Module):
 		x = x.reshape(x.shape[0], -1)
 		x = self.linear(x)
 		return x
+
+	def loss(
+		self,
+		y: torch.Tensor,
+		y_hat: torch.Tensor,
+		carry: dict[str, Union[float, int]],
+	) -> tuple[torch.nn.Module, dict[str, Union[float, int]]]:
+		criterion = torch.nn.MSELoss()
+		mse = criterion(y_hat, y)
+		return mse, {
+			'MSE': carry['MSE'] + mse.item() if 'MSE' in carry else mse.item(),
+		}
+
+	@cached_property
+	def optimiser(self) -> torch.optim.Optimizer:
+		if self.__optimiser == 'adam':
+			return torch.optim.Adam(self.parameters(), lr=self.lr)
+		elif self.__optimiser == 'sgd':
+			return torch.optim.SGD(self.parameters(), lr=self.lr)

@@ -1,3 +1,3 @@
-from .size_of_circular_drum import SizeOfCircularDrum
+from .CRePE import CRePE
 
-__all__ = ['SizeOfCircularDrum']
+__all__ = ['CRePE']
