@@ -9,7 +9,7 @@ if __name__ == '__main__':
 	# initialise arguments
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--config', default=None, help='yaml config file')
-	parser.add_argument('--testing', action='store_false', help='use testing dataset')
+	parser.add_argument('--evaluate', action='store_true', help='use evaluation dataset')
 	parser.add_argument('--wandb', action='store_true', help='log to wandb')
 	args = parser.parse_args()
 
@@ -19,7 +19,7 @@ if __name__ == '__main__':
 	# train model
 	training_routine(
 		config=args.config,
-		testing=args.testing,
+		testing=not args.evaluation,
 		wandb_config={} if args.wandb else None,
 	)
 	exit()

@@ -3,6 +3,7 @@
 .mypy_cache
 __pycache__
 /build
+/model
 /unused
 /wandb
 
