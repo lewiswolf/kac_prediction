@@ -1,11 +1,15 @@
-from .data_loader import getEvaluationDataset, getTestingDataset, getTrainingDataset
-from .load_model import loadModel
+from .data_loader import inferDatasetSplit, splitDataset
+# from .io import importDataset, loadModel
+# from .routine import Routine
 
 
 __all__ = [
-	'getEvaluationDataset',
-	'getTestingDataset',
-	'getTrainingDataset',
-	'loadModel',
+	# methods
+	'importDataset',
+	'inferDatasetSplit',
+	# 'loadModel',
+	'splitDataset',
+	# classes
+	# 'Routine',
 ]
 __all__.append('types')

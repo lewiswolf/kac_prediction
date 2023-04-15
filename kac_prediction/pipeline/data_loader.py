@@ -12,15 +12,13 @@ import torch		# pytorch
 # src
 from kac_drumset import TorchDataset
 
-__all__ = [
-	'inferSubdivisions',
-	'getEvaluationDataset',
-	'getTestingDataset',
-	'getTrainingDataset',
-]
+__all__ = ['inferDatasetSplit', 'splitDataset']
 
 
-def inferSubdivisions(dataset_size: int, split: tuple[float, float, float] = (0.7, 0.15, 0.15)) -> list[int]:
+def inferDatasetSplit(
+	dataset_size: int,
+	split: tuple[float, float, float] = (0.7, 0.15, 0.15),
+) -> tuple[int, int, int]:
 	'''
 	Calculates the integer splits for the training, testing and validation sets.
 	'''
@@ -30,55 +28,33 @@ def inferSubdivisions(dataset_size: int, split: tuple[float, float, float] = (0.
 	# this correction supposes that split[0] > split[1 or 2]
 	subdivisions[0] += dataset_size - sum(subdivisions)
 	# cumulative sums
-	return list(accumulate(subdivisions))
+	return tuple(list(accumulate(subdivisions))[0:3])
 
 
-def getEvaluationDataset(
+def splitDataset(
 	dataset: TorchDataset,
 	batch_size: int,
+	testing: bool,
 	split: tuple[float, float, float] = (0.7, 0.15, 0.15),
-) -> torch.utils.data.DataLoader:
+) -> tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader]:
 	'''
-	Extracts the evaluation subset from the dataset, and returns a DataLoader ready for evaluating a network.
-	'''
-
-	subdivisions = inferSubdivisions(dataset.__len__(), split)
-	return torch.utils.data.DataLoader(
-		dataset,
-		batch_size=batch_size,
-		sampler=torch.utils.data.SubsetRandomSampler(list(range(subdivisions[1], subdivisions[2]))),
-	)
-
-
-def getTestingDataset(
-	dataset: TorchDataset,
-	batch_size: int,
-	split: tuple[float, float, float] = (0.7, 0.15, 0.15),
-) -> torch.utils.data.DataLoader:
-	'''
-	Extracts the training subset from the dataset, and returns a DataLoader ready for testing a network.
+	Extracts the training, testing and evaluation subsets from the dataset, returning DataLoaders ready for a network.
 	'''
 
-	subdivisions = inferSubdivisions(dataset.__len__(), split)
-	return torch.utils.data.DataLoader(
-		dataset,
-		batch_size=batch_size,
-		sampler=torch.utils.data.SubsetRandomSampler(list(range(subdivisions[0], subdivisions[1]))),
-	)
-
-
-def getTrainingDataset(
-	dataset: TorchDataset,
-	batch_size: int,
-	split: tuple[float, float, float] = (0.7, 0.15, 0.15),
-) -> torch.utils.data.DataLoader:
-	'''
-	Extracts the training subset from the dataset, and returns a DataLoader ready for training a network.
-	'''
-
-	subdivisions = inferSubdivisions(dataset.__len__(), split)
-	return torch.utils.data.DataLoader(
-		dataset,
-		batch_size=batch_size,
-		sampler=torch.utils.data.SubsetRandomSampler(list(range(0, subdivisions[0]))),
+	subdivisions = inferDatasetSplit(dataset.__len__(), split)
+	return (
+		torch.utils.data.DataLoader(
+			dataset,
+			batch_size=batch_size,
+			sampler=torch.utils.data.SubsetRandomSampler(list(range(0, subdivisions[0]))),
+		),
+		torch.utils.data.DataLoader(
+			dataset,
+			batch_size=batch_size,
+			sampler=torch.utils.data.SubsetRandomSampler(list(range(subdivisions[0], subdivisions[1]))),
+		) if testing else torch.utils.data.DataLoader(
+			dataset,
+			batch_size=batch_size,
+			sampler=torch.utils.data.SubsetRandomSampler(list(range(subdivisions[1], subdivisions[2]))),
+		),
 	)

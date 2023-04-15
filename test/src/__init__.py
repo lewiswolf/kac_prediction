@@ -1,1 +1,3 @@
-# import kac_prediction
+from .test_pipeline import PipelineTests
+
+__all__ = ['PipelineTests']
