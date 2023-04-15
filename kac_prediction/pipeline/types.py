@@ -3,12 +3,13 @@ Utility types used throughout this code base.
 '''
 
 # core
-from typing import Any, Literal, TypedDict, Union
+from typing import Any, Literal, TypedDict
 from typing_extensions import TypeAlias
 
 __all__ = [
 	'Datasets',
 	'ExportedModel',
+	'Parameters',
 	'RunInfo',
 ]
 
@@ -29,13 +30,21 @@ Datasets: TypeAlias = Literal[
 class ExportedModel(TypedDict, total=True):
 	''' All the info needed to save and load a model. '''
 	epoch: int								# current epoch
-	evaluation_loss: Union[float, None]		# current evaluation loss, if not a test model
+	evaluation_loss: float | None			# current evaluation loss, if not a test model
 	model_state_dict: dict[str, Any]		# model parameters
 	model_args: dict[str, Any]				# model args
 	model_kwargs: dict[str, Any]			# model kwargs
 	optimizer_state_dict: dict[str, Any]	# current optimiser state
-	testing_loss: Union[float, None]		# current testing loss if a test model
+	testing_loss: float | None				# current testing loss if a test model
 	training_loss: float					# current training loss
+
+
+class Parameters(TypedDict, total=True):
+	''' Default parameters for any model. '''
+	batch_size: int
+	num_of_epochs: int
+	with_early_stopping: bool
+	testing: bool
 
 
 class RunInfo(TypedDict, total=True):

@@ -5,7 +5,7 @@ CRePE model for fundamental frequency detection.
 
 # core
 from functools import cached_property
-from typing import Literal, Union
+from typing import Literal
 
 # dependencies
 import torch
@@ -29,6 +29,7 @@ class CRePE(torch.nn.Module):
 		dropout: float
 		learning_rate: float
 		optimiser: Literal['adam', 'sgd']
+		outputs: int
 
 	class ConvLayer(torch.nn.Module):
 		'''
@@ -118,8 +119,8 @@ class CRePE(torch.nn.Module):
 		self,
 		y: torch.Tensor,
 		y_hat: torch.Tensor,
-		carry: dict[str, Union[float, int]],
-	) -> tuple[torch.nn.Module, dict[str, Union[float, int]]]:
+		carry: dict[str, float | int],
+	) -> tuple[torch.nn.Module, dict[str, float | int]]:
 		criterion = torch.nn.MSELoss()
 		mse = criterion(y_hat, y)
 		return mse, {
