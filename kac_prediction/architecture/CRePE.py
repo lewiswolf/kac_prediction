@@ -77,11 +77,11 @@ class CRePE(Model):
 		'''
 		Initialise CRePE model.
 		params:
-			depth 		limit the size of CRePE for a trade off in accuracy.
-			dropout 	hyperparameter
-			lr 			learning rate
-			optimiser 	optimiser
-			outputs		number of nodes in the output layer
+			depth 			limit the size of CRePE for a trade off in accuracy.
+			dropout 		hyperparameter
+			learning_rate	learning rate
+			optimiser 		optimiser
+			outputs			number of nodes in the output layer
 		'''
 
 		# init

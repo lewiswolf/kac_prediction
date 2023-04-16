@@ -57,57 +57,52 @@ class PipelineTests(TestCase):
 		'''
 		# Initialise a training routine.
 		with withoutPrinting():
-			training_routine = Routine()
-		R = training_routine.getRunInfo(
-			model_dir=self.tmp_dir,
-			wandb_config={},
-		)
+			routine = Routine(
+				model_dir=self.tmp_dir,
+				wandb_config={},
+			)
 
 		# This test asserts that the model directory exists.
-		self.assertTrue(os.path.isdir(R['model_dir']))
+		self.assertTrue(os.path.isdir(routine.R['model_dir']))
 
-		# This test assets that getParams returns the correct default dict.
-		self.assertEqual(
-			training_routine.getParams(
-				# default parameters
-				default=Parameters({
-					'batch_size': 5,
-					'num_of_epochs': 100,
-					'testing': True,
-					'with_early_stopping': False,
-				}),
-				config_path='',
-			),
-			{
+		# This test assets that getParameters returns the correct default dict.
+		routine.setParameters(
+			# default parameters
+			default=Parameters({
 				'batch_size': 5,
 				'num_of_epochs': 100,
 				'testing': True,
 				'with_early_stopping': False,
-			},
+			}),
+			config_path='',
 		)
+		self.assertEqual(routine.P, {
+			'batch_size': 5,
+			'num_of_epochs': 100,
+			'testing': True,
+			'with_early_stopping': False,
+		})
 
-		# This test assets that getParams returns the correct dict with an empty config file.
-		self.assertEqual(
-			training_routine.getParams(
-				# default parameters
-				default=Parameters({
-					'batch_size': 5,
-					'num_of_epochs': 100,
-					'testing': True,
-					'with_early_stopping': False,
-				}),
-				config_path=f'{self.asset_dir}/empty_config.yaml',
-			),
-			{
+		# This test assets that getParameters returns the correct dict with an empty config file.
+		routine.setParameters(
+			# default parameters
+			default=Parameters({
 				'batch_size': 5,
 				'num_of_epochs': 100,
 				'testing': True,
 				'with_early_stopping': False,
-			},
+			}),
+			config_path=f'{self.asset_dir}/empty_config.yaml',
 		)
+		self.assertEqual(routine.P, {
+			'batch_size': 5,
+			'num_of_epochs': 100,
+			'testing': True,
+			'with_early_stopping': False,
+		})
 
-		# This test assets that getParams returns the correct dict with a custom config file.
-		P = training_routine.getParams(
+		# This test assets that getParameters returns the correct dict with a custom config file.
+		routine.setParameters(
 			# default parameters
 			default=Parameters({
 				'batch_size': 5,
@@ -117,13 +112,13 @@ class PipelineTests(TestCase):
 			}),
 			config_path=f'{self.asset_dir}/custom_config.yaml',
 		)
-		self.assertEqual(P, {
+		self.assertEqual(routine.P, {
 			'batch_size': 10,
 			'num_of_epochs': 1000,
 			'testing': False,
 			'with_early_stopping': True,
 		})
-		self.assertFalse(hasattr(P, 'some_erroneous_key'))
+		self.assertFalse(hasattr(routine.P, 'some_erroneous_key'))
 
 	def test_wandb_routine(self) -> None:
 		'''
@@ -131,8 +126,7 @@ class PipelineTests(TestCase):
 		'''
 		# Run a training routine.
 		with withoutPrinting():
-			training_routine = Routine()
-			R = training_routine.getRunInfo(
+			routine = Routine(
 				model_dir='',
 				wandb_config={
 					'entity': 'lewiswolf',
@@ -142,4 +136,4 @@ class PipelineTests(TestCase):
 			wandb.finish()
 
 		# This test asserts that the model directory exists.
-		self.assertTrue(os.path.isdir(R['model_dir']))
+		self.assertTrue(os.path.isdir(routine.R['model_dir']))

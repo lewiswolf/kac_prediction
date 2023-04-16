@@ -1,5 +1,5 @@
 '''
-Full training and evaluation routine for the SizeOfCircularDrum model.
+Full training and evaluation routine for the DimOfRectangularDrum model.
 '''
 
 # core
@@ -10,14 +10,14 @@ from typing import Any
 import torch		# pytorch
 
 # src
-from kac_drumset import BesselModel, RepresentationSettings
+from kac_drumset import PoissonModel, RepresentationSettings
 from kac_prediction.architecture import CRePE
 from kac_prediction.pipeline import Routine
 
-__all__ = ['SizeOfCircularDrum']
+__all__ = ['DimOfRectangularDrum']
 
 
-def SizeOfCircularDrum(config_path: str = '', testing: bool = True, wandb_config: dict[str, Any] = {}) -> None:
+def DimOfRectangularDrum(config_path: str = '', testing: bool = True, wandb_config: dict[str, Any] = {}) -> None:
 	'''
 	Perform the entire training routine
 	'''
@@ -47,8 +47,8 @@ def SizeOfCircularDrum(config_path: str = '', testing: bool = True, wandb_config
 	# load, generate or install a dataset
 	routine.importDataset(
 		dataset_dir=os.path.normpath(f'{os.path.dirname(__file__)}/../data'),
-		dataset_name='' if routine.P['testing'] else '5000-circular-drums-of-varying-size',
-		LocalSampler=BesselModel,
+		dataset_name='' if routine.P['testing'] else '5000-rectangular-drums-of-varying-dimension',
+		LocalSampler=PoissonModel,
 		representation_settings=RepresentationSettings({
 			'normalise_input': True,
 			'output_type': 'end2end',
@@ -63,15 +63,15 @@ def SizeOfCircularDrum(config_path: str = '', testing: bool = True, wandb_config
 		dropout=routine.P['dropout'],
 		learning_rate=routine.P['learning_rate'],
 		optimiser=routine.P['optimiser'],
-		outputs=1,
+		outputs=2,
 	).to(routine.device)
 
 	# self.train()
 
 
 if __name__ == '__main__':
-	SizeOfCircularDrum(wandb_config={
+	DimOfRectangularDrum(wandb_config={
 		'entity': 'lewiswolf',
-		'project': 'kac_prediction (circular drum size)',
+		'project': 'kac_prediction (rectangular drum dimension)',
 	})
 	exit()
