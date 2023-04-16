@@ -5,6 +5,7 @@ subsets prepared for either training, testing or evaluating a neural network.
 
 # core
 from itertools import accumulate
+from typing import cast
 
 # dependencies
 import torch		# pytorch
@@ -28,7 +29,7 @@ def inferDatasetSplit(
 	# this correction supposes that split[0] > split[1 or 2]
 	subdivisions[0] += dataset_size - sum(subdivisions)
 	# cumulative sums
-	return tuple(list(accumulate(subdivisions))[0:3])
+	return cast(tuple[int, int, int], tuple(list(accumulate(subdivisions))[0:3]))
 
 
 def splitDataset(

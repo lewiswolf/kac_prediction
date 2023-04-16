@@ -5,18 +5,18 @@ CRePE model for fundamental frequency detection.
 
 # core
 from functools import cached_property
-from typing import Literal
+from typing import Any, Literal
 
 # dependencies
 import torch
 
 # src
-from ..pipeline.types import Parameters
+from ..pipeline import Model, Parameters
 
 __all__ = ['CRePE']
 
 
-class CRePE(torch.nn.Module):
+class CRePE(Model):
 	'''
 	A remake of CRePE, a deep CNN for pitch detection.
 	Source: https://github.com/marl/crepe
@@ -29,7 +29,6 @@ class CRePE(torch.nn.Module):
 		dropout: float
 		learning_rate: float
 		optimiser: Literal['adam', 'sgd']
-		outputs: int
 
 	class ConvLayer(torch.nn.Module):
 		'''
@@ -70,15 +69,19 @@ class CRePE(torch.nn.Module):
 		self,
 		depth: Literal['large', 'medium', 'small', 'tiny'],
 		dropout: float,
-		lr: float,
+		learning_rate: float,
 		optimiser: Literal['adam', 'sgd'],
 		outputs: int,
+		**kwargs: Any,
 	) -> None:
 		'''
 		Initialise CRePE model.
 		params:
-			depth: limit the size of CRePE for a trade off in accuracy.
-			dropout: hyperparameter
+			depth 		limit the size of CRePE for a trade off in accuracy.
+			dropout 	hyperparameter
+			lr 			learning rate
+			optimiser 	optimiser
+			outputs		number of nodes in the output layer
 		'''
 
 		# init
@@ -100,7 +103,7 @@ class CRePE(torch.nn.Module):
 		# fully connected layer
 		self.linear = torch.nn.Linear(64 * capacity_multiplier, outputs)
 		# optimiser
-		self.lr = lr
+		self.learning_rate = learning_rate
 		self.__optimiser = optimiser
 
 	def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -130,6 +133,6 @@ class CRePE(torch.nn.Module):
 	@cached_property
 	def optimiser(self) -> torch.optim.Optimizer:
 		if self.__optimiser == 'adam':
-			return torch.optim.Adam(self.parameters(), lr=self.lr)
+			return torch.optim.Adam(self.parameters(), lr=self.learning_rate)
 		elif self.__optimiser == 'sgd':
-			return torch.optim.SGD(self.parameters(), lr=self.lr)
+			return torch.optim.SGD(self.parameters(), lr=self.learning_rate)

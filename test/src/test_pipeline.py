@@ -4,11 +4,16 @@ import os
 from typing import get_args
 from unittest import TestCase
 
+# dependencies
+import wandb			# experiment tracking
+
 # src
-from kac_drumset.utils import clearDirectory
+from kac_drumset.utils import clearDirectory, withoutPrinting
 from kac_prediction.pipeline import (
 	inferDatasetSplit,
-	Types as T,
+	Routine,
+	Datasets,
+	Parameters,
 )
 
 
@@ -29,7 +34,7 @@ class PipelineTests(TestCase):
 		'''
 
 		# This test asserts that all of the dataset endpoints in  bin/install-dataset.sh exist.
-		for endpoint in get_args(T.Datasets):
+		for endpoint in get_args(Datasets):
 			self.assertLess(requests.head(f'https://zenodo.org/record/7274474/files/{endpoint}.zip?download=0').status_code, 400)
 
 		# This test asserts that inferDatasetSplit returns the correct values.
@@ -44,3 +49,55 @@ class PipelineTests(TestCase):
 		self.assertEqual(inferDatasetSplit(18), (12, 15, 18))
 		self.assertEqual(inferDatasetSplit(19), (13, 16, 19))
 		self.assertEqual(inferDatasetSplit(20), (14, 17, 20))
+
+	def test_local_routine(self) -> None:
+		'''
+		Tests used with pipeline/routines using a local run.
+		'''
+		# Initialise a training routine.
+		with withoutPrinting():
+			training_routine = Routine()
+		R = training_routine.getRunInfo(
+			model_dir=self.tmp_dir,
+			wandb_config={},
+		)
+
+		# This test asserts that the model directory exists.
+		self.assertTrue(os.path.isdir(R['model_dir']))
+
+		# This test assets that getParams returns the correct default dict.
+		P = training_routine.getParams(
+			# default parameters
+			default=Parameters({
+				'batch_size': 5,
+				'num_of_epochs': 100,
+				'testing': True,
+				'with_early_stopping': False,
+			}),
+			config_path='',
+		)
+		self.assertEqual({
+			'batch_size': 5,
+			'num_of_epochs': 100,
+			'testing': True,
+			'with_early_stopping': False,
+		}, P)
+
+	def test_wandb_routine(self) -> None:
+		'''
+		Tests used with pipeline/routines using a wandb run.
+		'''
+		# Run a training routine.
+		with withoutPrinting():
+			training_routine = Routine()
+			R = training_routine.getRunInfo(
+				model_dir='',
+				wandb_config={
+					'entity': 'lewiswolf',
+					'project': 'liltester',
+				},
+			)
+			wandb.finish()
+
+		# This test asserts that the model directory exists.
+		self.assertTrue(os.path.isdir(R['model_dir']))

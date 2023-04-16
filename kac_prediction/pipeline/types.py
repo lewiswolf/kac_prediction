@@ -14,11 +14,6 @@ __all__ = [
 ]
 
 
-# Percentage splits that sum to 1.
-# DatasetSplit: TypeAlias = Annotated[tuple[float, float, float], lambda x: sum(x) == 1.]
-# A probability value ∈ [0., 1.]
-# Probability: TypeAlias = Annotated[float, lambda x: x >= 0. and x <= 1.]
-
 # string literals for installing datasets
 Datasets: TypeAlias = Literal[
 	'2000-convex-polygonal-drums-of-varying-size',
@@ -41,10 +36,10 @@ class ExportedModel(TypedDict, total=True):
 
 class Parameters(TypedDict, total=True):
 	''' Default parameters for any model. '''
-	batch_size: int
-	num_of_epochs: int
-	with_early_stopping: bool
-	testing: bool
+	batch_size: int							# batch size
+	num_of_epochs: int						# number of epochs
+	testing: bool							# is the network being used for testing
+	with_early_stopping: bool				# should the network stop if it has reached a minima
 
 
 class RunInfo(TypedDict, total=True):

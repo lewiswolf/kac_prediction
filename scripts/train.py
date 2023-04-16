@@ -14,12 +14,15 @@ if __name__ == '__main__':
 	args = parser.parse_args()
 
 	# switch this import statement to work with a different model.
-	import routines.size_of_circular_drum as training_routine
+	from routines import SizeOfCircularDrum as training_routine
 
 	# train model
 	training_routine(
-		config=args.config,
-		testing=not args.evaluation,
-		wandb_config={} if args.wandb else None,
+		config_path=args.config or '',
+		testing=not args.evaluate,
+		wandb_config={
+			'entity': 'lewiswolf',
+			'project': 'kac_prediction (circular drum size)',
+		} if args.wandb else {},
 	)
 	exit()
