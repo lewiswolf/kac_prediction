@@ -30,7 +30,7 @@ class Routine:
 	M: Model					# Model
 	P: dict[str, Any]			# hyperparameters
 	R: RunInfo					# information about the training run
-	__using_wandb: bool			# hidden flag for wandb
+	_using_wandb: bool			# hidden flag for wandb
 
 	def __init__(self) -> None:
 		'''
@@ -49,21 +49,20 @@ class Routine:
 		default parameter value, a custom yaml file, or by being inferred from weights and biases.
 		params:
 			config_path		path to custom yaml file parameters
-			P				default parameters
+			default			default parameters
 		'''
 		# handle errors
-		# assert hasattr(self, '__using_wandb'), 'getRunInfo must be ran before getParams'
+		assert hasattr(self, '_using_wandb'), 'getRunInfo must be ran before getParams'
+		# init parameters
 		P = {key: value for key, value in default.items()}
 		# load a yaml config file for a single run
-		yaml_file: dict[str, Any] = {}
 		if config_path != '':
 			with open(config_path, 'r') as f:
-				yaml_file.update(yaml.safe_load(f))
-		P.update({key: yaml_file[key] if key in yaml_file else value for key, value in P.items()})
+				yaml_file = yaml.safe_load(f) or {}
+				P.update({key: yaml_file[key] if key in yaml_file else value for key, value in P.items()})
 		# update with wandb.config
-		if self.__using_wandb:
-			for key, value in P.items():
-				P[key] = wandb.config[key] if key in wandb.config else value
+		if self._using_wandb:
+			P.update({key: wandb.config[key] if key in wandb.config else value for key, value in P.items()})
 			wandb.config.update(P)
 		return P
 
@@ -77,24 +76,28 @@ class Routine:
 							- passing wandb_config is a normal call
 		'''
 		# initialise weights and biases
-		self.__using_wandb = wandb_config != {}
-		if self.__using_wandb:
+		self._using_wandb = wandb_config != {}
+		if self._using_wandb:
 			wandb.init(**wandb_config)
 		if wandb.run is not None:
 			return {'id': wandb.run.id, 'model_dir': wandb.run.dir}
 		# create local run and model_dir
 		else:
 			local_id: str = ''.join(random.choice(string.ascii_letters) for x in range(10))
-			model_dir = f'{model_dir}/run_{local_id}'
+			model_dir = f'{model_dir if model_dir != "" else "."}/run_{local_id}'
 			os.makedirs(model_dir)
 			return {'id': local_id, 'model_dir': model_dir}
 
-	# def train(self) -> None:
-	# 	'''
-	# 	'''
-	# 	self.model = M
-	# 	if self.__using_wandb:
-	# 		wandb.watch(self.M, log_freq=1000)
+	def train(self) -> None:
+		'''
+		'''
+		assert hasattr(self, 'D'), 'Routine.D: TorchDataset is not set.'
+		assert hasattr(self, 'M'), 'Routine.M: Model is not set.'
+		assert hasattr(self, 'P'), 'Routine.P: Parameters is not set. Run Routine.getParams()'
+		assert hasattr(self, 'R'), 'Routine.R: RunInfo is not set. Run Routine.getRunInfo()'
+
+		if self._using_wandb:
+			wandb.watch(self.M, log_freq=1000)
 
 	# 	# init dataset
 	# 	training_dataset, testing_dataset = splitDataset(self.D, self.P['batch_size'], self.P['testing'])

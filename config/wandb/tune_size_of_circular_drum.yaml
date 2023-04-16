@@ -1,4 +1,4 @@
-program: routines/size_of_circular_drum.py
+program: scripts/routines/size_of_circular_drum.py
 project: kac_prediction (circular drum size)
 method: random
 metric:

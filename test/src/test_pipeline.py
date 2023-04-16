@@ -22,6 +22,7 @@ class PipelineTests(TestCase):
 	Tests used in conjunction with `kac_prediction/pipeline`.
 	'''
 
+	asset_dir: str = os.path.normpath(f'{os.path.dirname(__file__)}/../assets')
 	tmp_dir: str = os.path.normpath(f'{os.path.dirname(__file__)}/../tmp')
 
 	def tearDown(self) -> None:
@@ -66,6 +67,46 @@ class PipelineTests(TestCase):
 		self.assertTrue(os.path.isdir(R['model_dir']))
 
 		# This test assets that getParams returns the correct default dict.
+		self.assertEqual(
+			training_routine.getParams(
+				# default parameters
+				default=Parameters({
+					'batch_size': 5,
+					'num_of_epochs': 100,
+					'testing': True,
+					'with_early_stopping': False,
+				}),
+				config_path='',
+			),
+			{
+				'batch_size': 5,
+				'num_of_epochs': 100,
+				'testing': True,
+				'with_early_stopping': False,
+			},
+		)
+
+		# This test assets that getParams returns the correct dict with an empty config file.
+		self.assertEqual(
+			training_routine.getParams(
+				# default parameters
+				default=Parameters({
+					'batch_size': 5,
+					'num_of_epochs': 100,
+					'testing': True,
+					'with_early_stopping': False,
+				}),
+				config_path=f'{self.asset_dir}/empty_config.yaml',
+			),
+			{
+				'batch_size': 5,
+				'num_of_epochs': 100,
+				'testing': True,
+				'with_early_stopping': False,
+			},
+		)
+
+		# This test assets that getParams returns the correct dict with a custom config file.
 		P = training_routine.getParams(
 			# default parameters
 			default=Parameters({
@@ -74,14 +115,15 @@ class PipelineTests(TestCase):
 				'testing': True,
 				'with_early_stopping': False,
 			}),
-			config_path='',
+			config_path=f'{self.asset_dir}/custom_config.yaml',
 		)
-		self.assertEqual({
-			'batch_size': 5,
-			'num_of_epochs': 100,
-			'testing': True,
-			'with_early_stopping': False,
-		}, P)
+		self.assertEqual(P, {
+			'batch_size': 10,
+			'num_of_epochs': 1000,
+			'testing': False,
+			'with_early_stopping': True,
+		})
+		self.assertFalse(hasattr(P, 'some_erroneous_key'))
 
 	def test_wandb_routine(self) -> None:
 		'''
