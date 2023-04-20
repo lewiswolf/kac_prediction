@@ -53,12 +53,12 @@ pipenf run python scripts/train.py -h
 usage: train.py [-h] [--config CONFIG] [--testing] [--wandb]
 options:
   -h, --help       show this help message and exit
-  --config CONFIG  yaml config file
+  --config CONFIG  path to yaml config file
   --testing        use testing dataset
   --wandb          log to wandb
 
 # wandb
-pipenv run wandb sweep config/wandb/...
+pipenv run wandb sweep scripts/config/wandb/...
 pipenv run wandb agent ...
 ```
 

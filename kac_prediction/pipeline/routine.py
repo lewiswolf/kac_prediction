@@ -2,6 +2,7 @@
 '''
 
 # core
+from itertools import accumulate
 import os
 import random
 import shlex
@@ -12,7 +13,7 @@ import yaml
 
 # dependencies
 import torch			# pytorch
-# from tqdm import tqdm	# progress bar
+from tqdm import tqdm	# progress bar
 import wandb			# experiment tracking
 
 # src
@@ -91,20 +92,20 @@ class Routine:
 		except Exception as e:
 			# if a metadata.json does not exist...
 			if type(e).__name__ == 'FileNotFoundError':
-				assert dataset_name != '' and LocalSampler is not None, \
+				assert dataset_name != '' or LocalSampler is not None, \
 					'importDataset requires at least a dataset_name or a LocalSampler to generate a new dataset'
 				# import the official dataset for this project
 				if dataset_name != '':
 					subprocess.run(shlex.split(f'sh ./bin/install-dataset.sh {dataset_name}'))
 					dataset = transformDataset(loadDataset(dataset_dir=dataset_dir), representation_settings)
 				# generate a dataset locally
-				else:
+				if LocalSampler is not None:
 					dataset = generateDataset(
 						LocalSampler,
 						dataset_dir=dataset_dir,
 						dataset_size=200,
 						representation_settings=representation_settings,
-						sampler_settings=LocalSampler.Settings(sampler_settings),
+						sampler_settings=sampler_settings,
 					)
 			else:
 				raise e
@@ -135,117 +136,130 @@ class Routine:
 	def train(self) -> None:
 		'''
 		'''
+		# handle errors
 		assert hasattr(self, 'D'), 'Routine.D: TorchDataset is not set.'
 		assert hasattr(self, 'M'), 'Routine.M: Model is not set.'
 		assert hasattr(self, 'P'), 'Routine.P: Parameters is not set. Run Routine.getParameters()'
 		assert hasattr(self, 'R'), 'Routine.R: RunInfo is not set. Run Routine.getRunInfo()'
 
+		# split dataset
+		subdivisions = [round(self.D.__len__() * p) for p in self.P['dataset_split']]
+		# this correction supposes that split[0] > split[1 or 2]
+		subdivisions[0] += self.D.__len__() - sum(subdivisions)
+		subdivisions = list(accumulate(subdivisions))[0:3]
+		training_dataset = torch.utils.data.DataLoader(
+			self.D,
+			batch_size=self.P['batch_size'],
+			sampler=torch.utils.data.SubsetRandomSampler(list(range(0, subdivisions[0]))),
+		)
+		testing_dataset = torch.utils.data.DataLoader(
+			self.D,
+			batch_size=self.P['batch_size'],
+			sampler=torch.utils.data.SubsetRandomSampler(list(range(subdivisions[0], subdivisions[1]))),
+		) if self.P['testing'] else torch.utils.data.DataLoader(
+			self.D,
+			batch_size=self.P['batch_size'],
+			sampler=torch.utils.data.SubsetRandomSampler(list(range(subdivisions[1], subdivisions[2]))),
+		)
+		# # init loss
+		# training_loss: dict[str, float | int] = {}
+		# testing_loss: dict[str, float | int] = {}
+		# test_loss_arr: list[float] = []
+		# test_loss_min: float = 1.
+		# loops
+		printEmojis('Training neural network... 🧠')
 		if self._using_wandb:
 			wandb.watch(self.M, log_freq=1000)
+		bar_format: str = '{percentage:3.0f}% |{bar}| {n_fmt}/{total_fmt}, Elapsed: {elapsed}, ETA: {remaining}, {rate_fmt} '
+		with tqdm(bar_format=bar_format, total=self.P['num_of_epochs'], unit='  epochs') as epoch_bar:
+			with tqdm(bar_format=bar_format, total=len(training_dataset), unit=' batches') as i_bar:
+				with tqdm(bar_format=bar_format, total=len(testing_dataset), unit=' batches') as t_bar:
+					epoch = 0
+					while self.P['num_of_epochs'] == 0 or epoch < self.P['num_of_epochs']:
+						# initialise ux and loss
+						i_bar.reset()
+						t_bar.reset()
+		# 				# training loop
+		# 				self.M.train()
+		# 				for (x, y) in training_dataset:
+		# 					x = x.to(self.device)
+		# 					y = y.to(self.device)
+		# 					y_hat = self.M(x)
+		# 					loss, training_loss = self.M.loss(y, y_hat, training_loss)
+		# 					assert not math.isnan(loss.item())
+		# 					loss.backward()
+		# 					self.M.optimiser.step()
+		# 					self.M.optimiser.zero_grad()
+		# 					i_bar.update(1)
+		# 				# evaluation / testing
+		# 				self.M.eval()
+		# 				with torch.no_grad():
+		# 					for (x, y) in testing_dataset:
+		# 						x = x.to(self.device)
+		# 						y = y.to(self.device)
+		# 						y_hat = self.M(x)
+		# 						loss, testing_loss = self.M.loss(y, y_hat, testing_loss)
+		# 						t_bar.update(1)
+		# 				# calculate overall loss
+		# 				training_loss = {key: value / len(training_dataset) for key, value in training_loss.items()}
+		# 				testing_loss = {key: value / len(testing_dataset) for key, value in testing_loss.items()}
 
-	# 	# init dataset
-	# 	training_dataset, testing_dataset = splitDataset(self.D, self.P['batch_size'], self.P['testing'])
-	# 	# init loss
-	# 	loss: torch.nn.Module
-	# 	training_loss: dict[str, float | int] = {}
-	# 	testing_loss: dict[str, float | int] = {}
-	# 	test_loss_arr: list[float] = []
-	# 	test_loss_min: float = 1.
-	# 	# loops
-	# 	printEmojis('Training neural network... 🧠')
-	# 	bar_format: str =
-	# 		'{percentage:3.0f}% |{bar}| {n_fmt}/{total_fmt}, Elapsed: {elapsed}, ETA: {remaining}, {rate_fmt} '
-	# 	with tqdm(bar_format=bar_format, total=self.P['num_of_epochs'], unit='  epochs') as epoch_bar:
-	# 		with tqdm(bar_format=bar_format, total=len(training_dataset), unit=' batches') as i_bar:
-	# 			with tqdm(bar_format=bar_format, total=len(testing_dataset), unit=' batches') as t_bar:
-	# 				epoch = 0
-	# 				while self.P['num_of_epochs'] == 0 or epoch < self.P['num_of_epochs']:
-	# 					# initialise ux and loss
-	# 					i_bar.reset()
-	# 					t_bar.reset()
-	# 					# training loop
-	# 					self.M.train()
-	# 					for i, (x, y) in enumerate(training_dataset):
-	# 						x = x.to(self.device)
-	# 						y = y.to(self.device)
-	# 						y_hat = self.M(x)
-	# 						loss, training_loss = self.M.loss(y, y_hat, training_loss)
-	# 						assert not math.isnan(loss.item())
-	# 						loss.backward()
-	# 						self.M.optimiser.step()
-	# 						self.M.optimiser.zero_grad()
-	# 						i_bar.update(1)
-	# 					# evaluation / testing
-	# 					self.M.eval()
-	# 					with torch.no_grad():
-	# 						for t, (x, y) in enumerate(testing_dataset):
-	# 							x = x.to(self.device)
-	# 							y = y.to(self.device)
-	# 							y_hat = self.M(x)
-	# 							loss, testing_loss = self.M.loss(y, y_hat, testing_loss)
-	# 							t_bar.update(1)
-	# 					# calculate overall loss
-	# 					training_loss = {key: value / len(training_dataset) for key, value in training_loss.items()}
-	# 					testing_loss = {key: value / len(testing_dataset) for key, value in testing_loss.items()}
+						# if t == 0:
+						# plot_data: tuple[float, float] = (0., 0.)
+						# 	plot_data = (y.detach().cpu().numpy()[0], y_hat.detach().cpu().numpy()[0])
+						# 	# plots
+						# 	truth_fig = figure(plot_height=300, plot_width=300, title='Ground Truth')
+						# 	pred_fig = figure(plot_height=300, plot_width=300, title='Prediction')
+						# 	plot_settings = {
+						# 		'fill_color': '#1B9E31',
+						# 		'line_color': '#126B21',
+						# 		'x': 0.,
+						# 		'y': 0.,
+						# 	}
+						# 	truth_fig.circle(radius=plot_data[0] / 2, **plot_settings)
+						# 	pred_fig.circle(radius=plot_data[1] / 2, **plot_settings)
+						# 'drum_example': wandb.Html(file_html(row(truth_fig, pred_fig), CDN, 'Drum Example.')),
 
-	# 					# if t == 0:
-	# 					# plot_data: tuple[float, float] = (0., 0.)
-	# 					# 	plot_data = (y.detach().cpu().numpy()[0], y_hat.detach().cpu().numpy()[0])
-	# 					# 	# plots
-	# 					# 	truth_fig = figure(plot_height=300, plot_width=300, title='Ground Truth')
-	# 					# 	pred_fig = figure(plot_height=300, plot_width=300, title='Prediction')
-	# 					# 	plot_settings = {
-	# 					# 		'fill_color': '#1B9E31',
-	# 					# 		'line_color': '#126B21',
-	# 					# 		'x': 0.,
-	# 					# 		'y': 0.,
-	# 					# 	}
-	# 					# 	truth_fig.circle(radius=plot_data[0] / 2, **plot_settings)
-	# 					# 	pred_fig.circle(radius=plot_data[1] / 2, **plot_settings)
-	# 					# 'drum_example': wandb.Html(file_html(row(truth_fig, pred_fig), CDN, 'Drum Example.')),
+						# save logs to wandb
+						# if self._using_wandb:
+						# 	wandb.log({
+						# 		'epoch': epoch,
+						# 		'evaluation': not self.P['testing'],
+						# 		'testing_loss': testing_loss,
+						# 		'training_loss': training_loss,
+						# 	}, commit=True)
 
-	# 					# save logs to wandb
-	# 					if self.__using_wandb:
-	# 						wandb.log({
-	# 							'epoch': epoch,
-	# 							'evaluation': not self.P['testing'],
-	# 							'testing_loss': testing_loss,
-	# 							'training_loss': training_loss,
-	# 						}, commit=True)
+						# save model
+						# if epoch > 50:
+						# 	torch.save(ExportedModel({
+						# 		'epoch': epoch,
+						# 		'evaluation_loss': testing_loss if not P['testing'] else None,
+						# 		'model_state_dict': self.M.state_dict(),
+						# 		'model_args': {
+						# 			'depth': P['depth'],
+						# 			'dropout': P['dropout'],
+						# 		},
+						# 		'model_kwargs': {},
+						# 		'optimizer_state_dict': optimiser.state_dict(),
+						# 		'testing_loss': testing_loss if P['testing'] else None,
+						# 		'training_loss': training_loss,
+						# 	}), f'{R["model_dir"]}/epoch_{epoch}.pth')
+						# 	if wandb_config is not None:
+						# 		# upload model
+						# 		wandb.save(
+						# 			os.path.join(R['model_dir'], f'epoch_{epoch}.pth'),
+						# 			R['model_dir'],
+						# 		)
 
-	# 					# save model
-	# 					if epoch == 0 and not os.path.isdir(self.R['model_dir']):
-	# 						os.makedirs(self.R['model_dir'])
-	# 					# if epoch > 50:
-	# 					# 	torch.save(ExportedModel({
-	# 					# 		'epoch': epoch,
-	# 					# 		'evaluation_loss': testing_loss if not P['testing'] else None,
-	# 					# 		'model_state_dict': self.M.state_dict(),
-	# 					# 		'model_args': {
-	# 					# 			'depth': P['depth'],
-	# 					# 			'dropout': P['dropout'],
-	# 					# 		},
-	# 					# 		'model_kwargs': {},
-	# 					# 		'optimizer_state_dict': optimiser.state_dict(),
-	# 					# 		'testing_loss': testing_loss if P['testing'] else None,
-	# 					# 		'training_loss': training_loss,
-	# 					# 	}), f'{R["model_dir"]}/epoch_{epoch}.pth')
-	# 					# 	if wandb_config is not None:
-	# 					# 		# upload model
-	# 					# 		wandb.save(
-	# 					# 			os.path.join(R['model_dir'], f'epoch_{epoch}.pth'),
-	# 					# 			R['model_dir'],
-	# 					# 		)
-
-	# 					# cleanup
-	# 					if torch.cuda.is_available():
-	# 						torch.cuda.empty_cache()
-	# 					# early stopping
-	# 					test_loss_arr.append(loss.item())
-	# 					test_loss_arr = test_loss_arr[-32:]
-	# 					test_loss_min = min(test_loss_min, loss.item())
-	# 					if (min(test_loss_arr) > test_loss_min):
-	# 						break
-	# 					# progress bar
-	# 					epoch_bar.update(1)
-	# 					epoch += 1
+						# early stopping
+						# test_loss_arr.append(loss.item())
+						# test_loss_arr = test_loss_arr[-32:]
+						# test_loss_min = min(test_loss_min, loss.item())
+						# if (min(test_loss_arr) > test_loss_min):
+						# 	break
+						# cleanup
+						if torch.cuda.is_available():
+							torch.cuda.empty_cache()
+						# progress bar
+						epoch_bar.update(1)
+						epoch += 1

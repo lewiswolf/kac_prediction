@@ -33,6 +33,7 @@ def DimOfRectangularDrum(config_path: str = '', testing: bool = True, wandb_conf
 		# default parameters
 		CRePE.ModelHyperParameters({
 			'batch_size': 5,
+			'dataset_split': (0.7, 0.15, 0.15),
 			'depth': 'tiny',
 			'dropout': 0.25,
 			'learning_rate': 1e-3,
@@ -46,13 +47,11 @@ def DimOfRectangularDrum(config_path: str = '', testing: bool = True, wandb_conf
 
 	# load, generate or install a dataset
 	routine.importDataset(
-		dataset_dir=os.path.normpath(f'{os.path.dirname(__file__)}/../data'),
+		dataset_dir=os.path.normpath(f'{os.path.dirname(__file__)}/../../data'),
 		dataset_name='' if routine.P['testing'] else '5000-rectangular-drums-of-varying-dimension',
 		LocalSampler=PoissonModel,
-		representation_settings=RepresentationSettings({
-			'normalise_input': True,
-			'output_type': 'end2end',
-		}),
+		representation_settings=RepresentationSettings({'normalise_input': True, 'output_type': 'end2end'}),
+		sampler_settings=PoissonModel.Settings({'duration': 1., 'sample_rate': 48000}),
 	)
 	routine.D.X = torch.narrow(routine.D.X, 1, 0, 1024)
 	routine.D.Y = torch.tensor([[y['drum_size']] for y in routine.D.Y]) # type: ignore

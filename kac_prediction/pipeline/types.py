@@ -24,25 +24,26 @@ Datasets: TypeAlias = Literal[
 
 class ExportedModel(TypedDict, total=True):
 	''' All the info needed to save and load a model. '''
-	epoch: int								# current epoch
-	evaluation_loss: float | None			# current evaluation loss, if not a test model
-	model_state_dict: dict[str, Any]		# model parameters
-	model_args: dict[str, Any]				# model args
-	model_kwargs: dict[str, Any]			# model kwargs
-	optimizer_state_dict: dict[str, Any]	# current optimiser state
-	testing_loss: float | None				# current testing loss if a test model
-	training_loss: float					# current training loss
+	epoch: int									# current epoch
+	evaluation_loss: float | None				# current evaluation loss, if not a test model
+	model_state_dict: dict[str, Any]			# model parameters
+	model_args: dict[str, Any]					# model args
+	model_kwargs: dict[str, Any]				# model kwargs
+	optimizer_state_dict: dict[str, Any]		# current optimiser state
+	testing_loss: float | None					# current testing loss if a test model
+	training_loss: float						# current training loss
 
 
 class Parameters(TypedDict, total=True):
 	''' Default parameters for any model. '''
-	batch_size: int							# batch size
-	num_of_epochs: int						# number of epochs
-	testing: bool							# is the network being used for testing
-	with_early_stopping: bool				# should the network stop if it has reached a minima
+	batch_size: int								# batch size
+	dataset_split: tuple[float, float, float]	# how is the dataset split between training, testing and evaluation
+	num_of_epochs: int							# number of epochs
+	testing: bool								# is the network being used for testing
+	with_early_stopping: bool					# should the network stop if it has reached a minima
 
 
 class RunInfo(TypedDict, total=True):
 	''' Info about the current training run. '''
-	id: str									# this training session's ID
-	model_dir: str							# where should the model be saved locally
+	id: str										# this training session's ID
+	model_dir: str								# where should the model be saved locally

@@ -8,7 +8,7 @@ if __name__ == '__main__':
 
 	# initialise arguments
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--config', default=None, help='yaml config file')
+	parser.add_argument('--config', default=None, help='path to yaml config file')
 	parser.add_argument('--evaluate', action='store_true', help='use evaluation dataset')
 	parser.add_argument('--wandb', action='store_true', help='log to wandb')
 	args = parser.parse_args()

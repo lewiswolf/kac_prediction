@@ -45,7 +45,6 @@ class CRePE(Model):
 				in_channels: input size.
 				dropout: probability for dropout nodes.
 			'''
-
 			super().__init__()
 			p1 = (width - 1) // 2
 			p2 = (width - 1) - p1
@@ -83,11 +82,10 @@ class CRePE(Model):
 			optimiser 		optimiser
 			outputs			number of nodes in the output layer
 		'''
-
 		# init
 		super().__init__()
-		capacity_multiplier: int = {'tiny': 4, 'small': 8, 'medium': 16, 'large': 24, 'full': 32}[depth]
 		# create 6 convolutional layers
+		capacity_multiplier: int = {'tiny': 4, 'small': 8, 'medium': 16, 'large': 24, 'full': 32}[depth]
 		filters: list[int] = [n * capacity_multiplier for n in [32, 4, 4, 4, 8, 16]]
 		widths: list[int] = [512, 64, 64, 64, 64, 64]
 		strides: list[int] = [4, 1, 1, 1, 1, 1]
