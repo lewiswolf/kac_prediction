@@ -57,12 +57,12 @@ class PipelineTests(TestCase):
 		# Initialise a training routine.
 		with withoutPrinting():
 			routine = Routine(
-				model_dir=self.tmp_dir,
+				exports_dir=self.tmp_dir,
 				wandb_config={},
 			)
 
 		# This test asserts that the model directory exists.
-		self.assertTrue(os.path.isdir(routine.R['model_dir']))
+		self.assertTrue(os.path.isdir(routine.R['exports_dir']))
 
 		# This test assets that getParameters returns the correct default dict.
 		routine.setParameters(
@@ -132,7 +132,7 @@ class PipelineTests(TestCase):
 		# Run a training routine.
 		with withoutPrinting():
 			routine = Routine(
-				model_dir='',
+				exports_dir='',
 				wandb_config={
 					'entity': 'lewiswolf',
 					'project': 'liltester',
@@ -141,4 +141,4 @@ class PipelineTests(TestCase):
 			wandb.finish()
 
 		# This test asserts that the model directory exists.
-		self.assertTrue(os.path.isdir(routine.R['model_dir']))
+		self.assertTrue(os.path.isdir(routine.R['exports_dir']))

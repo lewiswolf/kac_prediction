@@ -7,7 +7,12 @@ import os
 from typing import Any
 
 # dependencies
-import torch		# pytorch
+# from bokeh.embed import file_html	# convert plot to html
+# from bokeh.layouts import row		# align multiple plots horizontally
+# from bokeh.plotting import figure	# plot a figure
+# from bokeh.resources import CDN		# minified bokeh
+import torch						# pytorch
+import wandb						# experiment tracking
 
 # src
 from kac_drumset import BesselModel, RepresentationSettings
@@ -22,9 +27,9 @@ def SizeOfCircularDrum(config_path: str = '', testing: bool = True, wandb_config
 	Perform the entire training routine
 	'''
 
-	# initialise a default run
+	# initialise a default routine
 	routine = Routine(
-		model_dir=os.path.normpath(f'{os.path.dirname(__file__)}/../../model'),
+		exports_dir=os.path.normpath(f'{os.path.dirname(__file__)}/../../model'),
 		wandb_config=wandb_config,
 	)
 
@@ -37,11 +42,12 @@ def SizeOfCircularDrum(config_path: str = '', testing: bool = True, wandb_config
 			'depth': 'tiny',
 			'dropout': 0.25,
 			'learning_rate': 1e-3,
-			'num_of_epochs': 100,
+			'num_of_epochs': 10,
 			'optimiser': 'sgd',
 			'testing': testing,
 			'with_early_stopping': False,
 		}),
+		# yaml config path
 		config_path=config_path,
 	)
 
@@ -53,6 +59,8 @@ def SizeOfCircularDrum(config_path: str = '', testing: bool = True, wandb_config
 		representation_settings=RepresentationSettings({'normalise_input': True, 'output_type': 'end2end'}),
 		sampler_settings=BesselModel.Settings({'duration': 1., 'sample_rate': 48000}),
 	)
+
+	# shape data
 	routine.D.X = torch.narrow(routine.D.X, 1, 0, 1024)
 	routine.D.Y = torch.tensor([[y['drum_size']] for y in routine.D.Y]) # type: ignore
 
@@ -63,9 +71,43 @@ def SizeOfCircularDrum(config_path: str = '', testing: bool = True, wandb_config
 		learning_rate=routine.P['learning_rate'],
 		optimiser=routine.P['optimiser'],
 		outputs=1,
-	).to(routine.device)
+	)
 
-	# self.train()
+	# define how the model is to be tested
+	def innerTestingLoop(i: int, loop_length: float, x: torch.Tensor, y: torch.Tensor) -> None:
+		'''
+		This method should be designed to satisfy the loop:
+			for i, (x, y) in enumerate(testing_dataset):
+				Model.innerTrainingLoop(i, len(testing_dataset), x.to(device), y.to(device))
+		and should somewhere include the line:
+			self.testing_loss += ...
+		'''
+		y_hat = routine.M(x)
+		routine.M.testing_loss += routine.M.criterion(y, y_hat).item() / loop_length
+		if routine._using_wandb and i == loop_length - 1:
+			# plots
+			# truth_fig = figure(plot_height=300, plot_width=300, title='Ground Truth')
+			# pred_fig = figure(plot_height=300, plot_width=300, title='Prediction')
+			# plot_settings = {
+			# 	# 'plot_height': 300,
+			# 	'fill_color': '#1B9E31',
+			# 	'line_color': '#126B21',
+			# 	'x': 0.,
+			# 	'y': 0.,
+			# }
+			# truth_fig.circle(radius=y.detach().cpu().numpy()[0] / 2, **plot_settings)
+			# pred_fig.circle(radius=y_hat.detach().cpu().numpy()[0] / 2, **plot_settings)
+			# logs
+			wandb.log({
+				# 'drum_example': wandb.Html(file_html(row(truth_fig, pred_fig), CDN, 'Drum Example.')),
+				'epoch': routine.epoch,
+				'evaluation_loss': routine.M.testing_loss if not routine.P['testing'] else None,
+				'testing_loss': routine.M.testing_loss if routine.P['testing'] else None,
+				'training_loss': routine.M.training_loss,
+			}, commit=True)
+
+	# train and test a model
+	routine.train(innerTestingLoop)
 
 
 if __name__ == '__main__':

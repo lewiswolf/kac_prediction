@@ -4,7 +4,7 @@ CRePE model for fundamental frequency detection.
 '''
 
 # core
-from functools import cached_property
+import math
 from typing import Any, Literal
 
 # dependencies
@@ -24,7 +24,7 @@ class CRePE(Model):
 	'''
 
 	class ModelHyperParameters(Parameters):
-		''' Hyper parameters for this specific model. '''
+		''' Template for custom hyper parameters. '''
 		depth: Literal['large', 'medium', 'small', 'tiny']
 		dropout: float
 		learning_rate: float
@@ -100,13 +100,17 @@ class CRePE(Model):
 		)
 		# fully connected layer
 		self.linear = torch.nn.Linear(64 * capacity_multiplier, outputs)
+		# loss
+		self.criterion = torch.nn.MSELoss()
 		# optimiser
 		self.learning_rate = learning_rate
-		self.__optimiser = optimiser
+		if optimiser == 'adam':
+			self.optimiser = torch.optim.Adam(self.parameters(), lr=learning_rate)
+		elif optimiser == 'sgd':
+			self.optimiser = torch.optim.SGD(self.parameters(), lr=learning_rate)
 
 	def forward(self, x: torch.Tensor) -> torch.Tensor:
 		''' Forward pass. '''
-
 		assert x.shape[1] == 1024
 		x = x.view(x.shape[0], 1, -1, 1)
 		for layer in self.conv_layers:
@@ -116,21 +120,18 @@ class CRePE(Model):
 		x = self.linear(x)
 		return x
 
-	def loss(
-		self,
-		y: torch.Tensor,
-		y_hat: torch.Tensor,
-		carry: dict[str, float | int],
-	) -> tuple[torch.nn.Module, dict[str, float | int]]:
-		criterion = torch.nn.MSELoss()
-		mse = criterion(y_hat, y)
-		return mse, {
-			'MSE': carry['MSE'] + mse.item() if 'MSE' in carry else mse.item(),
-		}
-
-	@cached_property
-	def optimiser(self) -> torch.optim.Optimizer:
-		if self.__optimiser == 'adam':
-			return torch.optim.Adam(self.parameters(), lr=self.learning_rate)
-		elif self.__optimiser == 'sgd':
-			return torch.optim.SGD(self.parameters(), lr=self.learning_rate)
+	def innerTrainingLoop(self, loop_length: int, x: torch.Tensor, y: torch.Tensor) -> None:
+		'''
+		This inner training loop should be designed to satisfy the loop:
+			for (x, y) in training_dataset:
+				Model.innerTrainingLoop(len(training_dataset), x.to(device), y.to(device))
+		and should somewhere include the line:
+			self.training_loss += ...
+		'''
+		y_hat = self(x)
+		loss = self.criterion(y_hat, y)
+		self.training_loss += loss.item() / loop_length
+		assert not math.isnan(loss.item())
+		loss.backward()
+		self.optimiser.step()
+		self.optimiser.zero_grad()

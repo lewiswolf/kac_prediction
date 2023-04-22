@@ -45,5 +45,5 @@ class Parameters(TypedDict, total=True):
 
 class RunInfo(TypedDict, total=True):
 	''' Info about the current training run. '''
+	exports_dir: str							# absolute path to where the model should be saved locally
 	id: str										# this training session's ID
-	model_dir: str								# where should the model be saved locally
