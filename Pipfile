@@ -15,6 +15,7 @@ flake8 = "*"
 flake8-commas = "*"
 kac_prediction = {editable = true, path = "."}
 mypy = "*"
+numpy = "*"
 requests = "*"
 types-pyyaml = "*"
 types-requests = "*"

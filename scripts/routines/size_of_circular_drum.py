@@ -82,18 +82,16 @@ def SizeOfCircularDrum(config_path: str = '', testing: bool = True, wandb_config
 		and should somewhere include the line:
 			self.testing_loss += ...
 		'''
+		# calculate loss
 		y_hat = routine.M(x)
 		routine.M.testing_loss['aggregate'] += routine.M.criterion(y, y_hat).item() / loop_length
+		# log to wandb
 		if routine.using_wandb and i == loop_length - 1:
 			# plots
-			truth_fig = figure(height=300, width=300, title='Ground Truth')
-			pred_fig = figure(height=300, width=300, title='Prediction')
-			plot_settings = {
-				'fill_color': '#1B9E31',
-				'line_color': '#126B21',
-				'x': 0.,
-				'y': 0.,
-			}
+			plot_settings: dict[str, Any] = {'height': 300, 'width': 300}
+			truth_fig = figure(title='Ground Truth', **plot_settings)
+			pred_fig = figure(title='Prediction', **plot_settings)
+			plot_settings = {'fill_color': '#1B9E31', 'line_color': '#126B21', 'x': 0., 'y': 0.}
 			truth_fig.circle(radius=y.detach().cpu().numpy()[0] / 2, **plot_settings)
 			pred_fig.circle(radius=y_hat.detach().cpu().numpy()[0] / 2, **plot_settings)
 			# logs

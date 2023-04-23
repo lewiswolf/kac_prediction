@@ -79,10 +79,11 @@ def DimOfRectangularDrum(config_path: str = '', testing: bool = True, wandb_conf
 		'''
 		This method should be designed to satisfy the loop:
 			for i, (x, y) in enumerate(testing_dataset):
-				Model.innerTrainingLoop(i, len(testing_dataset), x.to(device), y.to(device))
+				innerTestingLoop(i, len(testing_dataset), x.to(device), y.to(device))
 		and should somewhere include the line:
 			self.testing_loss += ...
 		'''
+		# calculate loss
 		if i == 0:
 			routine.M.testing_loss.update({
 				'aspect_ratio': 0.,
@@ -92,7 +93,7 @@ def DimOfRectangularDrum(config_path: str = '', testing: bool = True, wandb_conf
 		routine.M.testing_loss['aggregate'] += routine.M.criterion(y, y_hat).item() / loop_length
 		routine.M.testing_loss['aspect_ratio'] += routine.M.criterion(y[0], y_hat[0]).item() / loop_length
 		routine.M.testing_loss['size'] += routine.M.criterion(y[1], y_hat[1]).item() / loop_length
-		# plots
+		# log to wandb
 		if routine.using_wandb and i == loop_length - 1:
 			# rectangle properties
 			y = y.detach().cpu().numpy()[0]
@@ -102,10 +103,7 @@ def DimOfRectangularDrum(config_path: str = '', testing: bool = True, wandb_conf
 			y_hat_height = y_hat[1] / (y_hat[0] ** 0.5)
 			y_hat_width = y_hat[1] * (y_hat[0] ** 0.5)
 			# plots
-			plot_settings: dict[str, Any] = {
-				'height': 300,
-				'width': 300,
-			}
+			plot_settings: dict[str, Any] = {'height': 300, 'width': 300}
 			max_dim = max(2., y_width / 2., y_height / 2.)
 			truth_fig = figure(
 				title='Ground Truth',
@@ -120,12 +118,7 @@ def DimOfRectangularDrum(config_path: str = '', testing: bool = True, wandb_conf
 				y_range=(max_dim * -1., max_dim),
 				**plot_settings,
 			)
-			plot_settings = {
-				'fill_color': '#1B9E31',
-				'line_color': '#126B21',
-				'x': 0.,
-				'y': 0.,
-			}
+			plot_settings = {'fill_color': '#1B9E31', 'line_color': '#126B21', 'x': 0., 'y': 0.}
 			truth_fig.rect(width=y_width, height=y_height, **plot_settings)
 			pred_fig.rect(width=y_hat_width, height=y_hat_height, **plot_settings)
 			# logs
