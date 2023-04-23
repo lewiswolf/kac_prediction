@@ -43,10 +43,10 @@ def DimOfRectangularDrum(config_path: str = '', testing: bool = True, wandb_conf
 			'depth': 'tiny',
 			'dropout': 0.25,
 			'learning_rate': 1e-3,
-			'num_of_epochs': 100,
+			'num_of_epochs': 50,
 			'optimiser': 'sgd',
 			'testing': testing,
-			'with_early_stopping': False,
+			'with_early_stopping': True,
 		}),
 		# yaml config path
 		config_path=config_path,
@@ -69,6 +69,7 @@ def DimOfRectangularDrum(config_path: str = '', testing: bool = True, wandb_conf
 		representation_settings=RepresentationSettings({'normalise_input': True, 'output_type': 'end2end'}),
 		sampler_settings=PoissonModel.Settings({'duration': 1., 'sample_rate': 48000}),
 	)
+
 	# shape data
 	routine.D.X = torch.narrow(routine.D.X, 1, 0, 1024)
 	routine.D.Y = torch.tensor([[y['aspect_ratio'], y['drum_size']] for y in routine.D.Y]) # type: ignore
@@ -82,8 +83,15 @@ def DimOfRectangularDrum(config_path: str = '', testing: bool = True, wandb_conf
 		and should somewhere include the line:
 			self.testing_loss += ...
 		'''
+		if i == 0:
+			routine.M.testing_loss.update({
+				'aspect_ratio': 0.,
+				'size': 0.,
+			})
 		y_hat = routine.M(x)
-		routine.M.testing_loss += routine.M.criterion(y, y_hat).item() / loop_length
+		routine.M.testing_loss['aggregate'] += routine.M.criterion(y, y_hat).item() / loop_length
+		routine.M.testing_loss['aspect_ratio'] += routine.M.criterion(y[0], y_hat[0]).item() / loop_length
+		routine.M.testing_loss['size'] += routine.M.criterion(y[1], y_hat[1]).item() / loop_length
 		# plots
 		if routine.using_wandb and i == loop_length - 1:
 			# rectangle properties

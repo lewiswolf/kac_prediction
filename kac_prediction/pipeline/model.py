@@ -4,6 +4,7 @@ This file defines the template class for a neural network, which is just a small
 
 # core
 from abc import ABC, abstractmethod
+from typing import Any
 
 # dependencies
 import torch
@@ -21,8 +22,8 @@ class Model(ABC, torch.nn.Module):
 
 	criterion: torch.nn.Module
 	optimiser: torch.optim.Optimizer
+	testing_loss: dict[str, Any]
 	training_loss: float
-	testing_loss: float
 
 	@abstractmethod
 	class ModelHyperParameters(Parameters):
@@ -31,8 +32,8 @@ class Model(ABC, torch.nn.Module):
 
 	def __init__(self) -> None:
 		super().__init__()
+		self.testing_loss = {'aggregate': 0.}
 		self.training_loss = 0.
-		self.testing_loss = 0.
 
 	@abstractmethod
 	def forward(self, x: torch.Tensor) -> torch.Tensor:

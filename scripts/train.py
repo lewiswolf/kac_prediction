@@ -14,8 +14,8 @@ if __name__ == '__main__':
 	args = parser.parse_args()
 
 	# switch this import statement to work with a different model.
-	# from routines import DimOfRectangularDrum as training_routine
-	from routines import SizeOfCircularDrum as training_routine
+	from routines import DimOfRectangularDrum as training_routine
+	# from routines import SizeOfCircularDrum as training_routine
 
 	# train model
 	training_routine(

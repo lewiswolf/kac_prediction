@@ -159,12 +159,12 @@ class PipelineTests(TestCase):
 		# define the inner testing loop
 		def innerTestingLoop(i: int, loop_length: int, x: torch.Tensor, y: torch.Tensor) -> None:
 			''' The testing loop ran during routine.train(). '''
-			routine.M.testing_loss += 1.
+			routine.M.testing_loss['aggregate'] += 1.
 			if i == loop_length - 1:
 				# This test asserts that the dataset was split correctly
 				self.assertEqual(loop_length, 200 * 0.15)
 				# This test asserts that, after a training run, training_loss and testing_loss are correctly at 1.
-				self.assertEqual(loop_length, routine.M.testing_loss)
+				self.assertEqual(loop_length, routine.M.testing_loss['aggregate'])
 
 		# run the training routine and tests defined above.
 		with withoutPrinting():
@@ -187,7 +187,7 @@ class PipelineTests(TestCase):
 		self.assertEqual(checkpoint['run_info']['epoch'], 0)
 		self.assertEqual(checkpoint['run_info']['exports_dir'], f'{self.model_dir}/{routine.R["id"]}')
 		self.assertEqual(checkpoint['run_info']['model']['name'], 'SimpleModel')
-		self.assertEqual(checkpoint['testing_loss'], 200 * 0.15)
+		self.assertEqual(checkpoint['testing_loss']['aggregate'], 200 * 0.15)
 		self.assertEqual(checkpoint['training_loss'], 200 * 0.7)
 
 	def test_wandb_routine(self) -> None:

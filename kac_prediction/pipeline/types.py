@@ -49,11 +49,11 @@ class RunInfo(TypedDict, total=True):
 class ExportedModel(TypedDict, total=True):
 	''' All the info needed to save and load a model. '''
 
-	dataset: dict[str, Any]
-	hyperparameters: dict[str, Any]
-	evaluation_loss: float | None				# current evaluation loss, if not a test model
+	dataset: dict[str, Any]						# metadata imported from TorchDataset
+	hyperparameters: dict[str, Any]				# a copy of ModelHyperParameters
+	evaluation_loss: dict[str, Any] | None		# current evaluation loss, if not a test model
 	model_state_dict: dict[str, Any]			# model parameters
 	optimizer_state_dict: dict[str, Any]		# current optimiser state
-	run_info: RunInfo
-	testing_loss: float | None					# current testing loss if a test model
+	run_info: RunInfo							# a copy of RunInfo
+	testing_loss: dict[str, Any] | None			# current testing loss if a test model
 	training_loss: float						# current training loss

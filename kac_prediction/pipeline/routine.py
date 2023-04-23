@@ -103,7 +103,7 @@ class Routine:
 			local_id = wandb.run.id
 		# create local id and exports_dir
 		else:
-			local_id: str = ''.join(random.choice(string.ascii_letters) for x in range(10))
+			local_id = ''.join(random.choice(string.ascii_letters) for x in range(10))
 			exports_dir = f'{exports_dir if exports_dir != "" else "."}/{local_id}'
 		# create RunInfo
 		os.makedirs(exports_dir)
@@ -222,7 +222,7 @@ class Routine:
 		if self.using_wandb:
 			wandb.watch(self.M, log_freq=1000)
 		self.M = self.M.to(self.device)
-		early_stopping_cache: tuple[list[float], float] | None = ([], 1.) if self.P['with_early_stopping'] else None
+		early_stopping_cache: tuple[list[float], float] | None = ([], 10.) if self.P['with_early_stopping'] else None
 		bar_format: str = '{percentage:3.0f}% |{bar}| {n_fmt}/{total_fmt}, Elapsed: {elapsed}, ETA: {remaining}, {rate_fmt} '
 		with tqdm(bar_format=bar_format, total=self.P['num_of_epochs'], unit='  epochs') as epoch_bar:
 			with tqdm(bar_format=bar_format, total=len(training_dataset), unit=' batches') as i_bar:
@@ -232,7 +232,7 @@ class Routine:
 						i_bar.reset()
 						t_bar.reset()
 						self.M.training_loss = 0.
-						self.M.testing_loss = 0.
+						self.M.testing_loss['aggregate'] = 0.
 						# training
 						self.M.train()
 						for i, (x, y) in enumerate(training_dataset):
@@ -265,14 +265,13 @@ class Routine:
 								wandb.save(
 									os.path.normpath(f'{self.R["exports_dir"]}/epoch_{self.R["epoch"]}.pt'),
 									self.R["exports_dir"],
-									'now',
 								)
 						# early stopping
 						if early_stopping_cache is not None:
-							early_stopping_cache[0].append(self.M.testing_loss)
+							early_stopping_cache[0].append(self.M.testing_loss['aggregate'])
 							early_stopping_cache = (
 								early_stopping_cache[0][-32:],
-								min(early_stopping_cache[1], self.M.testing_loss),
+								min(early_stopping_cache[1], self.M.testing_loss['aggregate']),
 							)
 							if (min(early_stopping_cache[0]) > early_stopping_cache[1]):
 								break

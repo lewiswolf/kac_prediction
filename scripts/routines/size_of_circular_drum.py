@@ -45,7 +45,7 @@ def SizeOfCircularDrum(config_path: str = '', testing: bool = True, wandb_config
 			'num_of_epochs': 50,
 			'optimiser': 'sgd',
 			'testing': testing,
-			'with_early_stopping': False,
+			'with_early_stopping': True,
 		}),
 		# yaml config path
 		config_path=config_path,
