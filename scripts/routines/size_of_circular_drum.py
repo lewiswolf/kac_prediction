@@ -78,12 +78,12 @@ def SizeOfCircularDrum(config_path: str = '', testing: bool = True, wandb_config
 		'''
 		This method should be designed to satisfy the loop:
 			for i, (x, y) in enumerate(testing_dataset):
-				Model.innerTrainingLoop(i, len(testing_dataset), x.to(device), y.to(device))
+				innerTestingLoop(i, len(testing_dataset), x.to(device), y.to(device))
 		and should somewhere include the line:
 			self.testing_loss += ...
 		'''
 		y_hat = routine.M(x)
-		routine.M.testing_loss += routine.M.criterion(y, y_hat).item() / loop_length
+		routine.M.testing_loss['aggregate'] += routine.M.criterion(y, y_hat).item() / loop_length
 		if routine.using_wandb and i == loop_length - 1:
 			# plots
 			truth_fig = figure(height=300, width=300, title='Ground Truth')
@@ -100,8 +100,8 @@ def SizeOfCircularDrum(config_path: str = '', testing: bool = True, wandb_config
 			wandb.log({
 				'drum_example': wandb.Html(file_html(Row(children=[truth_fig, pred_fig]), CDN, 'Drum Example.')),
 				'epoch': routine.R['epoch'],
-				'evaluation_loss': routine.M.testing_loss if not routine.P['testing'] else None,
-				'testing_loss': routine.M.testing_loss if routine.P['testing'] else None,
+				'evaluation_loss': routine.M.testing_loss['aggregate'] if not routine.P['testing'] else None,
+				'testing_loss': routine.M.testing_loss['aggregate'] if routine.P['testing'] else None,
 				'training_loss': routine.M.training_loss,
 			}, commit=True)
 

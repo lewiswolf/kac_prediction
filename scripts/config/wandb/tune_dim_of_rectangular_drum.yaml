@@ -1,5 +1,5 @@
-program: scripts/routines/size_of_circular_drum.py
-project: kac_prediction (circular drum size)
+program: scripts/routines/size_of_rectangular_drum.py
+project: kac_prediction (rectangular drum size)
 method: random
 metric:
   goal: minimize
@@ -8,7 +8,7 @@ parameters:
   batch_size:
     values: [1, 2, 4, 5, 8, 12, 16, 24, 32, 64]
   depth:
-    value: 'tiny'
+    values: ['large', 'medium', 'small', 'tiny']
   dropout:
     min: 0.0001
     max: 0.5
