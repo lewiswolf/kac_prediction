@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 kac-drumset = {git = "https://github.com/lewiswolf/kac_drumset.git"}
 torch = ">=2.0"
+tqdm = "*"
+wandb = "*"
 
 [dev-packages]
 bokeh = "*"
@@ -13,15 +15,14 @@ flake8 = "*"
 flake8-commas = "*"
 kac_prediction = {editable = true, path = "."}
 mypy = "*"
-tqdm = "*"
+requests = "*"
 types-pyyaml = "*"
 types-requests = "*"
 types-setuptools = "*"
 types-tqdm = "*"
-wandb = "*"
 
 [requires]
-python_version = "3.10"
+python_version = "3.11"
 
 [scripts]
 deploy = "python scripts/deploy.py"

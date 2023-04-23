@@ -1,4 +1,5 @@
 '''
+This file defines the template class for a neural network, which is just a small wrapper around a torch.nn.Module.
 '''
 
 # core
@@ -40,11 +41,11 @@ class Model(ABC, torch.nn.Module):
 		pass
 
 	@abstractmethod
-	def innerTrainingLoop(self, loop_length: int, x: torch.Tensor, y: torch.Tensor) -> None:
+	def innerTrainingLoop(self, i: int, loop_length: int, x: torch.Tensor, y: torch.Tensor) -> None:
 		'''
 		This inner training loop should be designed to satisfy the loop:
-			for (x, y) in training_dataset:
-				Model.innerTrainingLoop(len(training_dataset), x.to(device), y.to(device))
+			for i, (x, y) in enumerate(training_dataset):
+				Model.innerTrainingLoop(i, len(training_dataset), x.to(device), y.to(device))
 		and should somewhere include the line:
 			self.training_loss += ...
 		'''

@@ -22,7 +22,7 @@ if __name__ == '__main__':
 		testing=not args.evaluate,
 		wandb_config={
 			'entity': 'lewiswolf',
-			'project': 'kac_prediction (circular drum size)',
+			'project': 'liltester',
 		} if args.wandb else {},
 	)
 	exit()

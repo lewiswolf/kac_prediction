@@ -3,8 +3,7 @@ Utility types used throughout this code base.
 '''
 
 # core
-from typing import Any, Literal, TypedDict
-from typing_extensions import TypeAlias
+from typing import Any, Literal, TypeAlias, TypedDict
 
 __all__ = [
 	'Datasets',

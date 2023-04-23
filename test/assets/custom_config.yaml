@@ -1,5 +1,5 @@
-batch_size: 10
-num_of_epochs: 1000
-testing: False
+batch_size: 1
+num_of_epochs: 10
+testing: True
 with_early_stopping: True
 some_erroneous_key: False

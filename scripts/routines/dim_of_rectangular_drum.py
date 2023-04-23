@@ -80,7 +80,7 @@ def DimOfRectangularDrum(config_path: str = '', testing: bool = True, wandb_conf
 		y_hat = routine.M(x)
 		routine.M.testing_loss += routine.M.criterion(y, y_hat).item() / loop_length
 		# plots
-		if routine._using_wandb and i == loop_length - 1:
+		if routine.using_wandb and i == loop_length - 1:
 			# logs
 			wandb.log({
 				'epoch': routine.epoch,

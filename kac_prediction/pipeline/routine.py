@@ -1,4 +1,6 @@
 '''
+The idea behind this design is that a Routine can abstract all of the complicated communications between both pytorch
+and wandb, whilst simultaneously providing a central namespace for programming inside and outside of the routine.
 '''
 
 # core
@@ -73,7 +75,7 @@ class Routine:
 	M: Model					# Model
 	P: dict[str, Any]			# hyperparameters
 	R: RunInfo					# information about the training run
-	_using_wandb: bool			# hidden flag for wandb
+	using_wandb: bool			# hidden flag for wandb
 
 	def __init__(self, exports_dir: str = '', wandb_config: dict[str, Any] = {}) -> None:
 		'''
@@ -91,8 +93,8 @@ class Routine:
 			printEmojis('😓 WARNING 😓 Nvidia GPU support is not available for training the network.')
 			self.device = torch.device('cpu')
 		# initialise weights and biases
-		self._using_wandb = wandb_config != {}
-		if self._using_wandb:
+		self.using_wandb = wandb_config != {}
+		if self.using_wandb:
 			wandb.init(**wandb_config)
 		if wandb.run is not None:
 			self.R = {'exports_dir': wandb.run.dir, 'id': wandb.run.id}
@@ -116,12 +118,17 @@ class Routine:
 		and transformed if necessary. If the project is run in evaluation mode, the official dataset is downloaded using the
 		zenodo script in /bin. Else a small local dataset is generated for testing.
 		'''
+		# local dataset error
+		class DatasetError(Exception):
+			pass
 		# load a dataset normally
 		try:
 			dataset = transformDataset(loadDataset(dataset_dir=dataset_dir), representation_settings)
+			if LocalSampler is not None and dataset.sampler.name != LocalSampler.__name__:
+				raise DatasetError('Default dataset generator does not match the dataset stored in dataset_dir.')
 		except Exception as e:
 			# if a metadata.json does not exist...
-			if type(e).__name__ == 'FileNotFoundError':
+			if type(e).__name__ == 'DatasetError' or type(e).__name__ == 'FileNotFoundError':
 				assert dataset_name != '' or LocalSampler is not None, \
 					'importDataset() requires at least a dataset_name or a LocalSampler to produce a dataset.'
 				# import the official dataset for this project
@@ -150,7 +157,7 @@ class Routine:
 			default			default parameters
 		'''
 		# handle errors
-		assert hasattr(self, '_using_wandb'), 'getRunInfo must be ran before getParameters'
+		assert hasattr(self, 'using_wandb'), 'getRunInfo must be ran before getParameters'
 		# init parameters
 		self.P = {key: value for key, value in default.items()}
 		# load a yaml config file for a single run
@@ -159,7 +166,7 @@ class Routine:
 				yaml_file = yaml.safe_load(f) or {}
 				self.P.update({key: yaml_file[key] if key in yaml_file else value for key, value in self.P.items()})
 		# update with wandb.config
-		if self._using_wandb:
+		if self.using_wandb:
 			self.P.update({key: wandb.config[key] if key in wandb.config else value for key, value in self.P.items()})
 			wandb.config.update(self.P)
 
@@ -198,7 +205,7 @@ class Routine:
 		)
 		# loops
 		printEmojis('Training neural network... 🧠')
-		if self._using_wandb:
+		if self.using_wandb:
 			wandb.watch(self.M, log_freq=1000)
 		self.M = self.M.to(self.device)
 		early_stopping_cache: tuple[list[float], float] | None = ([], 1.) if self.P['with_early_stopping'] else None
@@ -215,8 +222,8 @@ class Routine:
 						self.M.testing_loss = 0.
 						# training
 						self.M.train()
-						for (x, y) in training_dataset:
-							self.M.innerTrainingLoop(len(training_dataset), x.to(self.device), y.to(self.device))
+						for i, (x, y) in enumerate(training_dataset):
+							self.M.innerTrainingLoop(i, len(training_dataset), x.to(self.device), y.to(self.device))
 							i_bar.update(1)
 						# evaluation / testing
 						self.M.eval()
@@ -224,9 +231,6 @@ class Routine:
 							for i, (x, y) in enumerate(testing_dataset):
 								innerTestingLoop(i, len(testing_dataset), x.to(self.device), y.to(self.device))
 								t_bar.update(1)
-
-						print(self.M.training_loss)
-						print(self.M.testing_loss)
 						# save model
 						# 	torch.save(ExportedModel({
 						# 		'epoch': epoch,
@@ -241,7 +245,7 @@ class Routine:
 						# 		'testing_loss': self.M.testing_loss if self.P['testing'] else None,
 						# 		'training_loss': self.M.training_loss,
 						# 	}), f'{self.R["exports_dir"]}/epoch_{epoch}.pth')
-						# 	if self._using_wandb:
+						# 	if self.using_wandb:
 						# 		# upload model
 						# 		wandb.save(
 						# 			os.path.join(self.R['exports_dir'], f'epoch_{epoch}.pth'),

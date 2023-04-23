@@ -7,10 +7,10 @@ import os
 from typing import Any
 
 # dependencies
-# from bokeh.embed import file_html	# convert plot to html
-# from bokeh.layouts import row		# align multiple plots horizontally
-# from bokeh.plotting import figure	# plot a figure
-# from bokeh.resources import CDN		# minified bokeh
+from bokeh.embed import file_html	# convert plot to html
+from bokeh.layouts import Row		# horizontal plots
+from bokeh.plotting import figure	# plot a figure
+from bokeh.resources import CDN		# minified bokeh
 import torch						# pytorch
 import wandb						# experiment tracking
 
@@ -42,7 +42,7 @@ def SizeOfCircularDrum(config_path: str = '', testing: bool = True, wandb_config
 			'depth': 'tiny',
 			'dropout': 0.25,
 			'learning_rate': 1e-3,
-			'num_of_epochs': 10,
+			'num_of_epochs': 50,
 			'optimiser': 'sgd',
 			'testing': testing,
 			'with_early_stopping': False,
@@ -84,22 +84,21 @@ def SizeOfCircularDrum(config_path: str = '', testing: bool = True, wandb_config
 		'''
 		y_hat = routine.M(x)
 		routine.M.testing_loss += routine.M.criterion(y, y_hat).item() / loop_length
-		if routine._using_wandb and i == loop_length - 1:
+		if routine.using_wandb and i == loop_length - 1:
 			# plots
-			# truth_fig = figure(plot_height=300, plot_width=300, title='Ground Truth')
-			# pred_fig = figure(plot_height=300, plot_width=300, title='Prediction')
-			# plot_settings = {
-			# 	# 'plot_height': 300,
-			# 	'fill_color': '#1B9E31',
-			# 	'line_color': '#126B21',
-			# 	'x': 0.,
-			# 	'y': 0.,
-			# }
-			# truth_fig.circle(radius=y.detach().cpu().numpy()[0] / 2, **plot_settings)
-			# pred_fig.circle(radius=y_hat.detach().cpu().numpy()[0] / 2, **plot_settings)
+			truth_fig = figure(height=300, width=300, title='Ground Truth')
+			pred_fig = figure(height=300, width=300, title='Prediction')
+			plot_settings = {
+				'fill_color': '#1B9E31',
+				'line_color': '#126B21',
+				'x': 0.,
+				'y': 0.,
+			}
+			truth_fig.circle(radius=y.detach().cpu().numpy()[0] / 2, **plot_settings)
+			pred_fig.circle(radius=y_hat.detach().cpu().numpy()[0] / 2, **plot_settings)
 			# logs
 			wandb.log({
-				# 'drum_example': wandb.Html(file_html(row(truth_fig, pred_fig), CDN, 'Drum Example.')),
+				'drum_example': wandb.Html(file_html(Row(children=[truth_fig, pred_fig]), CDN, 'Drum Example.')),
 				'epoch': routine.epoch,
 				'evaluation_loss': routine.M.testing_loss if not routine.P['testing'] else None,
 				'testing_loss': routine.M.testing_loss if routine.P['testing'] else None,
