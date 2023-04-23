@@ -124,7 +124,7 @@ class Routine:
 		# load a dataset normally
 		try:
 			dataset = transformDataset(loadDataset(dataset_dir=dataset_dir), representation_settings)
-			if LocalSampler is not None and dataset.sampler.name != LocalSampler.__name__:
+			if LocalSampler is not None and dataset.sampler['name'] != LocalSampler.__name__:
 				raise DatasetError('Default dataset generator does not match the dataset stored in dataset_dir.')
 		except Exception as e:
 			# if a metadata.json does not exist...

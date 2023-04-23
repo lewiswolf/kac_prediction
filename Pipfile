@@ -6,8 +6,8 @@ name = "pypi"
 [packages]
 kac-drumset = {git = "https://github.com/lewiswolf/kac_drumset.git"}
 torch = ">=2.0"
-tqdm = "*"
-wandb = "*"
+tqdm = ">=4.65"
+wandb = ">=0.15"
 
 [dev-packages]
 bokeh = "*"

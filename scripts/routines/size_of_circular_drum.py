@@ -107,6 +107,7 @@ def SizeOfCircularDrum(config_path: str = '', testing: bool = True, wandb_config
 
 	# train and test a model
 	routine.train(innerTestingLoop)
+	wandb.finish()
 
 
 if __name__ == '__main__':

@@ -7,6 +7,11 @@ import os
 from typing import Any
 
 # dependencies
+from bokeh.embed import file_html	# convert plot to html
+from bokeh.layouts import Row		# horizontal plots
+from bokeh.plotting import figure	# plot a figure
+from bokeh.resources import CDN		# minified bokeh
+import numpy as np					# math
 import torch						# pytorch
 import wandb						# experiment tracking
 
@@ -57,7 +62,7 @@ def DimOfRectangularDrum(config_path: str = '', testing: bool = True, wandb_conf
 	)
 	# shape data
 	routine.D.X = torch.narrow(routine.D.X, 1, 0, 1024)
-	routine.D.Y = torch.tensor([[y['drum_size']] for y in routine.D.Y]) # type: ignore
+	routine.D.Y = torch.tensor([[y['aspect_ratio'], y['drum_size']] for y in routine.D.Y]) # type: ignore
 
 	# configure model
 	routine.M = CRePE(
@@ -81,8 +86,43 @@ def DimOfRectangularDrum(config_path: str = '', testing: bool = True, wandb_conf
 		routine.M.testing_loss += routine.M.criterion(y, y_hat).item() / loop_length
 		# plots
 		if routine.using_wandb and i == loop_length - 1:
+			# rectangle properties
+			y = y.detach().cpu().numpy()[0]
+			y_height = y[1] / (y[0] ** 0.5)
+			y_width = y[1] * (y[0] ** 0.5)
+			y_hat = np.abs(y_hat.detach().cpu().numpy()[0])
+			y_hat_height = y_hat[1] / (y_hat[0] ** 0.5)
+			y_hat_width = y_hat[1] * (y_hat[0] ** 0.5)
+			# plots
+			plot_settings = {
+				'height': 300,
+				'width': 300,
+			}
+			max_dim = max(2., y_width / 2., y_height / 2.)
+			truth_fig = figure(
+				x_range=(max_dim * -1., max_dim),
+				y_range=(max_dim * -1., max_dim),
+				title='Ground Truth',
+				**plot_settings,
+			)
+			max_dim = max(2., y_hat_width / 2., y_hat_height / 2.)
+			pred_fig = figure(
+				x_range=(max_dim * -1., max_dim),
+				y_range=(max_dim * -1., max_dim),
+				title='Prediction',
+				**plot_settings,
+			)
+			plot_settings = {
+				'fill_color': '#1B9E31',
+				'line_color': '#126B21',
+				'x': 0.,
+				'y': 0.,
+			}
+			truth_fig.rect(width=y_width, height=y_height, **plot_settings)
+			pred_fig.rect(width=y_hat_width, height=y_hat_height, **plot_settings)
 			# logs
 			wandb.log({
+				'drum_example': wandb.Html(file_html(Row(children=[truth_fig, pred_fig]), CDN, 'Drum Example.')),
 				'epoch': routine.epoch,
 				'evaluation_loss': routine.M.testing_loss if not routine.P['testing'] else None,
 				'testing_loss': routine.M.testing_loss if routine.P['testing'] else None,
@@ -91,6 +131,7 @@ def DimOfRectangularDrum(config_path: str = '', testing: bool = True, wandb_conf
 
 	# train and test a model
 	routine.train(innerTestingLoop)
+	wandb.finish()
 
 
 if __name__ == '__main__':
