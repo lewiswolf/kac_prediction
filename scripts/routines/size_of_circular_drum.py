@@ -51,6 +51,15 @@ def SizeOfCircularDrum(config_path: str = '', testing: bool = True, wandb_config
 		config_path=config_path,
 	)
 
+	# configure model
+	routine.setModel(CRePE(
+		depth=routine.P['depth'],
+		dropout=routine.P['dropout'],
+		learning_rate=routine.P['learning_rate'],
+		optimiser=routine.P['optimiser'],
+		outputs=1,
+	))
+
 	# load, generate or install a dataset
 	routine.importDataset(
 		dataset_dir=os.path.normpath(f'{os.path.dirname(__file__)}/../../data'),
@@ -63,15 +72,6 @@ def SizeOfCircularDrum(config_path: str = '', testing: bool = True, wandb_config
 	# shape data
 	routine.D.X = torch.narrow(routine.D.X, 1, 0, 1024)
 	routine.D.Y = torch.tensor([[y['drum_size']] for y in routine.D.Y]) # type: ignore
-
-	# configure model
-	routine.M = CRePE(
-		depth=routine.P['depth'],
-		dropout=routine.P['dropout'],
-		learning_rate=routine.P['learning_rate'],
-		optimiser=routine.P['optimiser'],
-		outputs=1,
-	)
 
 	# define how the model is to be tested
 	def innerTestingLoop(i: int, loop_length: float, x: torch.Tensor, y: torch.Tensor) -> None:
@@ -99,7 +99,7 @@ def SizeOfCircularDrum(config_path: str = '', testing: bool = True, wandb_config
 			# logs
 			wandb.log({
 				'drum_example': wandb.Html(file_html(Row(children=[truth_fig, pred_fig]), CDN, 'Drum Example.')),
-				'epoch': routine.epoch,
+				'epoch': routine.R['epoch'],
 				'evaluation_loss': routine.M.testing_loss if not routine.P['testing'] else None,
 				'testing_loss': routine.M.testing_loss if routine.P['testing'] else None,
 				'training_loss': routine.M.training_loss,

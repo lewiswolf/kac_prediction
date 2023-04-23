@@ -52,6 +52,15 @@ def DimOfRectangularDrum(config_path: str = '', testing: bool = True, wandb_conf
 		config_path=config_path,
 	)
 
+	# configure model
+	routine.setModel(CRePE(
+		depth=routine.P['depth'],
+		dropout=routine.P['dropout'],
+		learning_rate=routine.P['learning_rate'],
+		optimiser=routine.P['optimiser'],
+		outputs=2,
+	))
+
 	# load, generate or install a dataset
 	routine.importDataset(
 		dataset_dir=os.path.normpath(f'{os.path.dirname(__file__)}/../../data'),
@@ -63,15 +72,6 @@ def DimOfRectangularDrum(config_path: str = '', testing: bool = True, wandb_conf
 	# shape data
 	routine.D.X = torch.narrow(routine.D.X, 1, 0, 1024)
 	routine.D.Y = torch.tensor([[y['aspect_ratio'], y['drum_size']] for y in routine.D.Y]) # type: ignore
-
-	# configure model
-	routine.M = CRePE(
-		depth=routine.P['depth'],
-		dropout=routine.P['dropout'],
-		learning_rate=routine.P['learning_rate'],
-		optimiser=routine.P['optimiser'],
-		outputs=2,
-	)
 
 	# define how the model is to be tested
 	def innerTestingLoop(i: int, loop_length: float, x: torch.Tensor, y: torch.Tensor) -> None:
@@ -94,22 +94,22 @@ def DimOfRectangularDrum(config_path: str = '', testing: bool = True, wandb_conf
 			y_hat_height = y_hat[1] / (y_hat[0] ** 0.5)
 			y_hat_width = y_hat[1] * (y_hat[0] ** 0.5)
 			# plots
-			plot_settings = {
+			plot_settings: dict[str, Any] = {
 				'height': 300,
 				'width': 300,
 			}
 			max_dim = max(2., y_width / 2., y_height / 2.)
 			truth_fig = figure(
+				title='Ground Truth',
 				x_range=(max_dim * -1., max_dim),
 				y_range=(max_dim * -1., max_dim),
-				title='Ground Truth',
 				**plot_settings,
 			)
 			max_dim = max(2., y_hat_width / 2., y_hat_height / 2.)
 			pred_fig = figure(
+				title='Prediction',
 				x_range=(max_dim * -1., max_dim),
 				y_range=(max_dim * -1., max_dim),
-				title='Prediction',
 				**plot_settings,
 			)
 			plot_settings = {
@@ -123,7 +123,7 @@ def DimOfRectangularDrum(config_path: str = '', testing: bool = True, wandb_conf
 			# logs
 			wandb.log({
 				'drum_example': wandb.Html(file_html(Row(children=[truth_fig, pred_fig]), CDN, 'Drum Example.')),
-				'epoch': routine.epoch,
+				'epoch': routine.R['epoch'],
 				'evaluation_loss': routine.M.testing_loss if not routine.P['testing'] else None,
 				'testing_loss': routine.M.testing_loss if routine.P['testing'] else None,
 				'training_loss': routine.M.training_loss,

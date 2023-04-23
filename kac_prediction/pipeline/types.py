@@ -21,16 +21,12 @@ Datasets: TypeAlias = Literal[
 ]
 
 
-class ExportedModel(TypedDict, total=True):
-	''' All the info needed to save and load a model. '''
-	epoch: int									# current epoch
-	evaluation_loss: float | None				# current evaluation loss, if not a test model
-	model_state_dict: dict[str, Any]			# model parameters
-	model_args: dict[str, Any]					# model args
-	model_kwargs: dict[str, Any]				# model kwargs
-	optimizer_state_dict: dict[str, Any]		# current optimiser state
-	testing_loss: float | None					# current testing loss if a test model
-	training_loss: float						# current training loss
+class ModelInfo(TypedDict, total=True):
+	'''
+	Information about the model used during a training loop.
+	'''
+	name: str		# name of the model
+	version: str	# version of kac_prediction the model originates from
 
 
 class Parameters(TypedDict, total=True):
@@ -44,5 +40,20 @@ class Parameters(TypedDict, total=True):
 
 class RunInfo(TypedDict, total=True):
 	''' Info about the current training run. '''
+	epoch: int
 	exports_dir: str							# absolute path to where the model should be saved locally
 	id: str										# this training session's ID
+	model: ModelInfo | None
+
+
+class ExportedModel(TypedDict, total=True):
+	''' All the info needed to save and load a model. '''
+
+	dataset: dict[str, Any]
+	hyperparameters: dict[str, Any]
+	evaluation_loss: float | None				# current evaluation loss, if not a test model
+	model_state_dict: dict[str, Any]			# model parameters
+	optimizer_state_dict: dict[str, Any]		# current optimiser state
+	run_info: RunInfo
+	testing_loss: float | None					# current testing loss if a test model
+	training_loss: float						# current training loss

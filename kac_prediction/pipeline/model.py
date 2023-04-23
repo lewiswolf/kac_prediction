@@ -20,7 +20,6 @@ class Model(ABC, torch.nn.Module):
 	'''
 
 	criterion: torch.nn.Module
-	epoch: int
 	optimiser: torch.optim.Optimizer
 	training_loss: float
 	testing_loss: float

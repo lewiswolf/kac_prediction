@@ -4,6 +4,7 @@ and wandb, whilst simultaneously providing a central namespace for programming i
 '''
 
 # core
+from importlib.metadata import version
 from itertools import accumulate
 import os
 import random
@@ -20,7 +21,7 @@ import wandb			# experiment tracking
 
 # src
 from .model import Model
-from .types import Datasets, Parameters, RunInfo
+from .types import Datasets, ExportedModel, Parameters, RunInfo
 from kac_drumset import (
 	# methods
 	generateDataset,
@@ -96,14 +97,22 @@ class Routine:
 		self.using_wandb = wandb_config != {}
 		if self.using_wandb:
 			wandb.init(**wandb_config)
+		# create wandb id and exports_dir
 		if wandb.run is not None:
-			self.R = {'exports_dir': wandb.run.dir, 'id': wandb.run.id}
-		# create local run and exports_dir
+			exports_dir = os.path.normpath(f'{wandb.run.dir}/../model')
+			local_id = wandb.run.id
+		# create local id and exports_dir
 		else:
 			local_id: str = ''.join(random.choice(string.ascii_letters) for x in range(10))
 			exports_dir = f'{exports_dir if exports_dir != "" else "."}/{local_id}'
-			os.makedirs(exports_dir)
-			self.R = {'exports_dir': exports_dir, 'id': local_id}
+		# create RunInfo
+		os.makedirs(exports_dir)
+		self.R = {
+			'epoch': 0,
+			'exports_dir': exports_dir,
+			'id': local_id,
+			'model': None,
+		}
 
 	def importDataset(
 		self,
@@ -148,6 +157,11 @@ class Routine:
 				raise e
 		self.D = dataset
 
+	def setModel(self, M: Model) -> None:
+		''' Set the routine's neural network and update RunInfo. '''
+		self.M = M
+		self.R['model'] = {'name': type(M).__name__, 'version': version('kac_prediction')}
+
 	def setParameters(self, default: Parameters, config_path: str = '') -> None:
 		'''
 		This method initialises weights and biases if it is being used, and creates the variable self.P using either a
@@ -176,15 +190,15 @@ class Routine:
 		testing loops, and exporting/saving the trained model. This method takes as its argument an innerTestingLoop(), which
 		should be designed to satisfy the loop:
 			for i, (x, y) in enumerate(testing_dataset):
-				Model.innerTrainingLoop(i, len(testing_dataset), x.to(device), y.to(device))
+				innerTestingLoop(i, len(testing_dataset), x.to(device), y.to(device))
 		and should somewhere include the line:
 			self.testing_loss += ...
 		'''
 		# handle errors
 		assert hasattr(self, 'D'), 'Routine.D: TorchDataset is not set.'
-		assert hasattr(self, 'M'), 'Routine.M: Model is not set.'
-		assert hasattr(self, 'P'), 'Routine.P: Parameters is not set. Run Routine.getParameters()'
-		assert hasattr(self, 'R'), 'Routine.R: RunInfo is not set. Run Routine.getRunInfo()'
+		assert hasattr(self, 'M'), 'Routine.M: Model is not set - run Routine.setModel().'
+		assert hasattr(self, 'P'), 'Routine.P: Parameters is not set - run Routine.setParameters().'
+		# assert hasattr(self, 'R'), 'Routine.R: RunInfo is not set - run Routine.getRunInfo()'
 		# split dataset
 		subdivisions = [round(self.D.__len__() * p) for p in self.P['dataset_split']]
 		subdivisions[0] += self.D.__len__() - sum(subdivisions) # this correction supposes that split[0] > split[1 or 2]
@@ -213,8 +227,7 @@ class Routine:
 		with tqdm(bar_format=bar_format, total=self.P['num_of_epochs'], unit='  epochs') as epoch_bar:
 			with tqdm(bar_format=bar_format, total=len(training_dataset), unit=' batches') as i_bar:
 				with tqdm(bar_format=bar_format, total=len(testing_dataset), unit=' batches') as t_bar:
-					self.epoch = 0
-					while self.P['num_of_epochs'] == 0 or self.epoch < self.P['num_of_epochs']:
+					while self.P['num_of_epochs'] == 0 or self.R['epoch'] < self.P['num_of_epochs']:
 						# initialise
 						i_bar.reset()
 						t_bar.reset()
@@ -232,25 +245,28 @@ class Routine:
 								innerTestingLoop(i, len(testing_dataset), x.to(self.device), y.to(self.device))
 								t_bar.update(1)
 						# save model
-						# 	torch.save(ExportedModel({
-						# 		'epoch': epoch,
-						# 		'evaluation_loss': self.M.testing_loss if not self.P['testing'] else None,
-						# 		'model_state_dict': self.M.state_dict(),
-						# 		'model_args': {
-						# 			'depth': self.P['depth'],
-						# 			'dropout': self.P['dropout'],
-						# 		},
-						# 		'model_kwargs': {},
-						# 		'optimizer_state_dict': self.M.optimiser.state_dict(),
-						# 		'testing_loss': self.M.testing_loss if self.P['testing'] else None,
-						# 		'training_loss': self.M.training_loss,
-						# 	}), f'{self.R["exports_dir"]}/epoch_{epoch}.pth')
-						# 	if self.using_wandb:
-						# 		# upload model
-						# 		wandb.save(
-						# 			os.path.join(self.R['exports_dir'], f'epoch_{epoch}.pth'),
-						# 			self.R['exports_dir'],
-						# 		)
+						if self.R['epoch'] % 5 == 0 or self.R['epoch'] > 40:
+							torch.save(ExportedModel({
+								'dataset': {
+									"dataset_size": self.D.__len__(),
+									"representation_settings": self.D.representation_settings,
+									"sampler": self.D.sampler,
+									"sampler_settings": self.D.sampler_settings,
+								},
+								'evaluation_loss': self.M.testing_loss if not self.P['testing'] else None,
+								'hyperparameters': self.P,
+								'model_state_dict': self.M.state_dict(),
+								'optimizer_state_dict': self.M.optimiser.state_dict(),
+								'run_info': self.R,
+								'testing_loss': self.M.testing_loss if self.P['testing'] else None,
+								'training_loss': self.M.training_loss,
+							}), f'{self.R["exports_dir"]}/epoch_{self.R["epoch"]}.pt')
+							if self.using_wandb:
+								wandb.save(
+									os.path.normpath(f'{self.R["exports_dir"]}/epoch_{self.R["epoch"]}.pt'),
+									self.R["exports_dir"],
+									'now',
+								)
 						# early stopping
 						if early_stopping_cache is not None:
 							early_stopping_cache[0].append(self.M.testing_loss)
@@ -265,4 +281,4 @@ class Routine:
 							torch.cuda.empty_cache()
 						# progress bar
 						epoch_bar.update(1)
-						self.epoch += 1
+						self.R['epoch'] += 1

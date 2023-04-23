@@ -27,11 +27,12 @@ class PipelineTests(TestCase):
 	'''
 
 	asset_dir: str = os.path.normpath(f'{os.path.dirname(__file__)}/../assets')
-	tmp_dir: str = os.path.normpath(f'{os.path.dirname(__file__)}/../tmp')
+	data_dir: str = os.path.normpath(f'{os.path.dirname(__file__)}/../tmp/data')
+	model_dir: str = os.path.normpath(f'{os.path.dirname(__file__)}/../tmp/model')
 
 	def tearDown(self) -> None:
 		''' destructor '''
-		clearDirectory(self.tmp_dir)
+		clearDirectory(os.path.normpath(f'{os.path.dirname(__file__)}/../tmp'))
 
 	def test_dataset_io(self) -> None:
 		'''
@@ -49,7 +50,7 @@ class PipelineTests(TestCase):
 		# Initialise a training routine.
 		with withoutPrinting():
 			routine = Routine(
-				exports_dir=self.tmp_dir,
+				exports_dir=self.model_dir,
 				wandb_config={},
 			)
 
@@ -120,8 +121,7 @@ class PipelineTests(TestCase):
 		# load a simple dataset
 		with withoutPrinting():
 			routine.importDataset(
-				dataset_dir=self.tmp_dir,
-				dataset_name='',
+				dataset_dir=self.data_dir,
 				LocalSampler=TestTone,
 			)
 		routine.D.Y = torch.tensor([[y['f_0']] for y in routine.D.Y]) # type: ignore
@@ -136,6 +136,8 @@ class PipelineTests(TestCase):
 
 			def __init__(self) -> None:
 				super().__init__()
+				self.criterion = torch.nn.MSELoss()
+				self.optimiser = torch.optim.Optimizer([torch.empty(0)], {})
 
 			def forward(self, x: torch.Tensor) -> torch.Tensor:
 				''' torch.nn.Module.forward() '''
@@ -149,7 +151,7 @@ class PipelineTests(TestCase):
 					assert self.training_loss == loop_length and self.training_loss == 200 * 0.7
 
 		# load model
-		routine.M = SimpleModel()
+		routine.setModel(SimpleModel())
 
 		# This test asserts that the model was properly instantiated.
 		self.assertIsInstance(routine.M, Model)
@@ -167,6 +169,26 @@ class PipelineTests(TestCase):
 		# run the training routine and tests defined above.
 		with withoutPrinting():
 			routine.train(innerTestingLoop)
+
+		# This test asserts the training routine correctly exported a model checkpoint.
+		self.assertTrue(os.path.isfile(f'{routine.R["exports_dir"]}/epoch_0.pt'))
+		checkpoint = torch.load(f'{routine.R["exports_dir"]}/epoch_0.pt')
+		# These test asserts that exported model has the correct metadata.
+		self.assertEqual(checkpoint['dataset']['dataset_size'], 200)
+		self.assertEqual(checkpoint['dataset']['sampler']['name'], 'TestTone')
+		self.assertTrue(checkpoint['evaluation_loss'] is None)
+		self.assertEqual(checkpoint['hyperparameters'], {
+			'batch_size': 1,
+			'dataset_split': (0.7, 0.15, 0.15),
+			'num_of_epochs': 10,
+			'testing': True,
+			'with_early_stopping': True,
+		})
+		self.assertEqual(checkpoint['run_info']['epoch'], 0)
+		self.assertEqual(checkpoint['run_info']['exports_dir'], f'{self.model_dir}/{routine.R["id"]}')
+		self.assertEqual(checkpoint['run_info']['model']['name'], 'SimpleModel')
+		self.assertEqual(checkpoint['testing_loss'], 200 * 0.15)
+		self.assertEqual(checkpoint['training_loss'], 200 * 0.7)
 
 	def test_wandb_routine(self) -> None:
 		'''

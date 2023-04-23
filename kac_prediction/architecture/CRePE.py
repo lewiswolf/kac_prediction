@@ -5,7 +5,7 @@ CRePE model for fundamental frequency detection.
 
 # core
 import math
-from typing import Any, Literal
+from typing import Literal
 
 # dependencies
 import torch
@@ -71,7 +71,6 @@ class CRePE(Model):
 		learning_rate: float,
 		optimiser: Literal['adam', 'sgd'],
 		outputs: int,
-		**kwargs: Any,
 	) -> None:
 		'''
 		Initialise CRePE model.
@@ -87,13 +86,11 @@ class CRePE(Model):
 		# create 6 convolutional layers
 		capacity_multiplier: int = {'tiny': 4, 'small': 8, 'medium': 16, 'large': 24, 'full': 32}[depth]
 		filters: list[int] = [n * capacity_multiplier for n in [32, 4, 4, 4, 8, 16]]
-		widths: list[int] = [512, 64, 64, 64, 64, 64]
-		strides: list[int] = [4, 1, 1, 1, 1, 1]
 		self.conv_layers = torch.nn.ModuleList(
 			[self.ConvLayer(
 				filters[n],
-				widths[n],
-				strides[n],
+				[512, 64, 64, 64, 64, 64][n],
+				[4, 1, 1, 1, 1, 1][n],
 				1 if n == 0 else filters[n - 1],
 				dropout,
 			) for n in range(6)],
@@ -116,9 +113,7 @@ class CRePE(Model):
 		for layer in self.conv_layers:
 			x = layer(x)
 		x = x.permute(0, 3, 2, 1)
-		x = x.reshape(x.shape[0], -1)
-		x = self.linear(x)
-		return x
+		return self.linear(x.reshape(x.shape[0], -1))
 
 	def innerTrainingLoop(self, i: int, loop_length: int, x: torch.Tensor, y: torch.Tensor) -> None:
 		'''
@@ -128,10 +123,9 @@ class CRePE(Model):
 		and should somewhere include the line:
 			self.training_loss += ...
 		'''
-		y_hat = self(x)
-		loss = self.criterion(y_hat, y)
-		self.training_loss += loss.item() / loop_length
+		loss = self.criterion(self(x), y)
 		assert not math.isnan(loss.item())
 		loss.backward()
 		self.optimiser.step()
 		self.optimiser.zero_grad()
+		self.training_loss += loss.item() / loop_length
