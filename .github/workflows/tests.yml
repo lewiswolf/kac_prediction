@@ -6,7 +6,7 @@ on:
     pull_request:
         branches: [master]
 
-env
+env:
   WANDB_MODE: offline
 
 jobs:
