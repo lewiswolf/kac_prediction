@@ -7,7 +7,7 @@ on:
         branches: [master]
 
 env:
-  WANDB_MODE: offline
+    WANDB_MODE: offline
 
 jobs:
     installation:
