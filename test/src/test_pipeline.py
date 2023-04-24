@@ -102,7 +102,7 @@ class PipelineTests(TestCase):
 			# default parameters
 			default=Parameters({
 				'batch_size': 5,
-				'dataset_split': (0.7, 0.15, 0.15),
+				'dataset_split': (0.6, 0.2, 0.2),
 				'num_of_epochs': 100,
 				'testing': False,
 				'with_early_stopping': False,
