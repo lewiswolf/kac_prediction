@@ -54,7 +54,7 @@ jobs:
 
             - name: Install OS specific dependencies
               if: ${{ matrix.os == 'ubuntu-latest' }}
-              run: 
+              run: |
                   pipenv run pip install torch torchaudio --index-url https://download.pytorch.org/whl/cpu
                   pipenv run pip install google
 
