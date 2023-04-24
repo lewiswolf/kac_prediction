@@ -1,7 +1,3 @@
-'''
-Full training and evaluation routine for the SizeOfCircularDrum model.
-'''
-
 # core
 import os
 from typing import Any

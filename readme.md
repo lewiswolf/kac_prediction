@@ -15,13 +15,45 @@ pip install "git+https://github.com/lewiswolf/kac_prediction.git#egg=kac_predict
 
 # Usage
 
-## Core Library
+<details>
+<summary>Core Library</summary>
 
-...
+### Import
 
-## Models
+```python
 
-...
+```
+
+### Classes
+
+```python
+
+```
+
+### Types
+
+```python
+
+```
+
+</details>
+
+<details>
+<summary>Models</summary>
+
+### Import
+
+```python
+
+```
+
+### Classes
+
+```python
+
+```
+
+</details>
 
 # Development / Local Training
 
@@ -34,6 +66,8 @@ pip install "git+https://github.com/lewiswolf/kac_prediction.git#egg=kac_predict
 ```bash
 git clone ...
 pipenv install -d
+# then for targetting gpus and linux distros
+pipenv run pip install torch torchaudio --index-url ...
 ```
 
 ### Training Commands
@@ -66,8 +100,4 @@ pipenv run wandb agent ...
 
 ```bash
 pipenv run test
-```
-
-```bash
-pipenv run deploy
 ```
