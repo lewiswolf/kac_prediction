@@ -1,5 +1,5 @@
-program: scripts/routines/size_of_rectangular_drum.py
-project: kac_prediction (rectangular drum size)
+program: scripts/routines/dim_of_rectangular_drum.py
+project: kac_prediction (rectangular drum dim)
 method: random
 metric:
   goal: minimize
