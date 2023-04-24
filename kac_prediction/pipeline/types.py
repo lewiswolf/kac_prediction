@@ -13,7 +13,7 @@ __all__ = [
 ]
 
 
-# string literals for installing datasets
+# string literals for installable datasets
 Datasets: TypeAlias = Literal[
 	'2000-convex-polygonal-drums-of-varying-size',
 	'5000-circular-drums-of-varying-size',

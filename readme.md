@@ -130,6 +130,13 @@ class Routine:
 ### Types
 
 ```python
+# string literals for installable datasets
+Datasets: TypeAlias = Literal[
+	'2000-convex-polygonal-drums-of-varying-size',
+	'5000-circular-drums-of-varying-size',
+	'5000-rectangular-drums-of-varying-dimension',
+]
+
 class ExportedModel(TypedDict, total=True):
 	''' All the info needed to save and load a model. '''
 	dataset: dict[str, Any]						# metadata imported from TorchDataset
