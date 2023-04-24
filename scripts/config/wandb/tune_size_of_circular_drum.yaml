@@ -19,4 +19,6 @@ parameters:
     value: 0
   optimiser:
     values: ['adam', 'sgd']
+  with_early_stopping:
+    value: True
     
