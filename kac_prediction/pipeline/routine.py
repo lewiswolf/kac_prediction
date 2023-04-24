@@ -71,7 +71,6 @@ class Routine:
 	'''
 
 	device: torch.device 		# device
-	epoch: int					# epoch for the training loop
 	D: TorchDataset				# dataset
 	M: Model					# Model
 	P: dict[str, Any]			# hyperparameters
@@ -80,7 +79,7 @@ class Routine:
 
 	def __init__(self, exports_dir: str = '', wandb_config: dict[str, Any] = {}) -> None:
 		'''
-		The init method initialises the training device.
+		The init method initialises self.device, self.using_wandb and self.R.
 		params:
 			exports_dir		directory for the local model
 			wandb_config	initialise wandb
@@ -123,9 +122,9 @@ class Routine:
 		sampler_settings: SamplerSettings = {'duration': 1., 'sample_rate': 48000},
 	) -> None:
 		'''
-		Load, download or locally generate a dataset. If a dataset already exists in dataset_dir, then that dataset is loaded
-		and transformed if necessary. If the project is run in evaluation mode, the official dataset is downloaded using the
-		zenodo script in /bin. Else a small local dataset is generated for testing.
+		Load, download or locally generate a dataset and store it as self.D. If a dataset already exists in dataset_dir, then
+		that dataset is loaded and transformed if necessary. If the project is run in evaluation mode, the official dataset
+		is downloaded using the zenodo script in /bin. Else a small local dataset is generated for testing.
 		'''
 		# local dataset error
 		class DatasetError(Exception):

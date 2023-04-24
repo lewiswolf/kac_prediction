@@ -22,11 +22,9 @@ Datasets: TypeAlias = Literal[
 
 
 class ModelInfo(TypedDict, total=True):
-	'''
-	Information about the model used during a training loop.
-	'''
-	name: str		# name of the model
-	version: str	# version of kac_prediction the model originates from
+	''' Information about the model used during a training loop. '''
+	name: str									# name of the model
+	version: str								# version of kac_prediction the model originates from
 
 
 class Parameters(TypedDict, total=True):
@@ -48,7 +46,6 @@ class RunInfo(TypedDict, total=True):
 
 class ExportedModel(TypedDict, total=True):
 	''' All the info needed to save and load a model. '''
-
 	dataset: dict[str, Any]						# metadata imported from TorchDataset
 	hyperparameters: dict[str, Any]				# a copy of ModelHyperParameters
 	evaluation_loss: dict[str, Any] | None		# current evaluation loss, if not a test model
