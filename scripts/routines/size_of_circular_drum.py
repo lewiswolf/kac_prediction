@@ -18,7 +18,7 @@ from kac_prediction.pipeline import Routine
 __all__ = ['SizeOfCircularDrum']
 
 
-def SizeOfCircularDrum(config_path: str = '', testing: bool = True, wandb_config: dict[str, Any] = {}) -> None:
+def SizeOfCircularDrum(config_path: str = '', wandb_config: dict[str, Any] = {}) -> None:
 	'''
 	Perform the entire training routine
 	'''
@@ -40,7 +40,7 @@ def SizeOfCircularDrum(config_path: str = '', testing: bool = True, wandb_config
 			'learning_rate': 1e-3,
 			'num_of_epochs': 50,
 			'optimiser': 'sgd',
-			'testing': testing,
+			'testing': True,
 			'with_early_stopping': True,
 		}),
 		# yaml config path

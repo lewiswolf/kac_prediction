@@ -279,10 +279,9 @@ Then run the example training script using.
 pipenv run python scripts/train.py -h
 	usage: train.py [-h] [--config CONFIG] [--testing] [--wandb]
 	options:
-	-h, --help       show this help message and exit
-	--config CONFIG  path to yaml config file
-	--testing        use testing dataset
-	--wandb          log to wandb
+	-h, --help			show this help message and exit
+	--config CONFIG		path to yaml config file
+	--wandb				log to wandb
 
 # wandb
 pipenv run wandb sweep scripts/config/wandb/...

@@ -176,7 +176,7 @@ class Routine:
 		# load a yaml config file for a single run
 		if config_path != '':
 			with open(config_path, 'r') as f:
-				yaml_file = yaml.safe_load(f) or {}
+				yaml_file = yaml.load(f.read(), Loader=yaml.FullLoader) or {}
 				self.P.update({key: yaml_file[key] if key in yaml_file else value for key, value in self.P.items()})
 		# update with wandb.config
 		if self.using_wandb:

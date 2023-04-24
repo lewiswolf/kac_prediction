@@ -1,4 +1,5 @@
 batch_size: 1
+dataset_split: !!python/tuple [0.7, 0.15, 0.15]
 num_of_epochs: 10
 testing: True
 with_early_stopping: True

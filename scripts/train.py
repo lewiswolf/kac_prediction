@@ -9,7 +9,6 @@ if __name__ == '__main__':
 	# initialise arguments
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--config', default=None, help='path to yaml config file')
-	parser.add_argument('--evaluate', action='store_true', help='use evaluation dataset')
 	parser.add_argument('--wandb', action='store_true', help='log to wandb')
 	args = parser.parse_args()
 
@@ -20,7 +19,6 @@ if __name__ == '__main__':
 	# train model
 	training_routine(
 		config_path=args.config or '',
-		testing=not args.evaluate,
 		wandb_config={
 			'entity': 'lewiswolf',
 			'project': 'liltester',
