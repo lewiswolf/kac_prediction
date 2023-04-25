@@ -128,7 +128,6 @@ def DimOfRectangularDrum(config_path: str = '', wandb_config: dict[str, Any] = {
 
 	# train and test a model
 	routine.train(innerTestingLoop)
-	wandb.finish()
 
 
 if __name__ == '__main__':
@@ -136,4 +135,3 @@ if __name__ == '__main__':
 		'entity': 'lewiswolf',
 		'project': 'kac_prediction (rectangular drum dimension)',
 	})
-	exit()

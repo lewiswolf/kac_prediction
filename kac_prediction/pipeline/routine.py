@@ -33,7 +33,7 @@ from kac_drumset import (
 	SamplerSettings,
 	TorchDataset,
 )
-from kac_drumset.utils import printEmojis
+from kac_drumset.utils import clearDirectory, printEmojis
 
 
 class Routine:
@@ -280,3 +280,8 @@ class Routine:
 						# progress bar
 						epoch_bar.update(1)
 						self.R['epoch'] += 1
+		# exit
+		if self.P['testing']:
+			clearDirectory(self.R['exports_dir'])
+		wandb.finish()
+		exit()

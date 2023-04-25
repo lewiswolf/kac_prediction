@@ -9,3 +9,4 @@ __pycache__
 
 # files
 .DS_Store
+Pipfile.lock
