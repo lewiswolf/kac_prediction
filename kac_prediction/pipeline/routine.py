@@ -98,14 +98,14 @@ class Routine:
 			wandb.init(**wandb_config)
 		# create wandb id and exports_dir
 		if wandb.run is not None:
-			exports_dir = os.path.normpath(f'{wandb.run.dir}/../model')
+			exports_dir = wandb.run.dir
 			local_id = wandb.run.id
 		# create local id and exports_dir
 		else:
 			local_id = ''.join(random.choice(string.ascii_letters) for x in range(10))
 			exports_dir = f'{exports_dir if exports_dir != "" else "."}/{local_id}'
+			os.makedirs(exports_dir)
 		# create RunInfo
-		os.makedirs(exports_dir)
 		self.R = {
 			'epoch': 0,
 			'exports_dir': exports_dir,
@@ -204,17 +204,19 @@ class Routine:
 		subdivisions = list(accumulate(subdivisions))[0:3]
 		training_dataset = torch.utils.data.DataLoader(
 			self.D,
-			batch_size=self.P['batch_size'],
-			sampler=torch.utils.data.SubsetRandomSampler(list(range(0, subdivisions[0]))),
+			batch_size=min(self.P['batch_size'], subdivisions[0]) if self.P['batch_size'] > 0 else subdivisions[0],
+			sampler=torch.utils.data.Subset(list(range(0, subdivisions[0]))),
 		)
 		testing_dataset = torch.utils.data.DataLoader(
 			self.D,
-			batch_size=self.P['batch_size'],
-			sampler=torch.utils.data.SubsetRandomSampler(list(range(subdivisions[0], subdivisions[1]))),
-		) if self.P['testing'] else torch.utils.data.DataLoader(
-			self.D,
-			batch_size=self.P['batch_size'],
-			sampler=torch.utils.data.SubsetRandomSampler(list(range(subdivisions[1], subdivisions[2]))),
+			batch_size=max(min(
+				self.P['batch_size'],
+				subdivisions[1] - subdivisions[0] if self.P['testing'] else subdivisions[2] - subdivisions[1],
+			), 1),
+			sampler=torch.utils.data.Subset(list(range(
+				subdivisions[0 if self.P['testing'] else 1],
+				subdivisions[1 if self.P['testing'] else 2],
+			))),
 		)
 		# loops
 		printEmojis('Training neural network... 🧠')
@@ -272,7 +274,7 @@ class Routine:
 								early_stopping_cache[0][-32:],
 								min(early_stopping_cache[1], self.M.testing_loss['aggregate']),
 							)
-							if (min(early_stopping_cache[0]) > early_stopping_cache[1]):
+							if self.R['epoch'] > 32 and (min(early_stopping_cache[0]) > early_stopping_cache[1]):
 								break
 						# cleanup
 						if torch.cuda.is_available():
