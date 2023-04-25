@@ -205,7 +205,7 @@ class Routine:
 		training_dataset = torch.utils.data.DataLoader(
 			self.D,
 			batch_size=min(self.P['batch_size'], subdivisions[0]) if self.P['batch_size'] > 0 else subdivisions[0],
-			sampler=torch.utils.data.Subset(list(range(0, subdivisions[0]))),
+			sampler=torch.utils.data.SubsetRandomSampler(list(range(0, subdivisions[0]))),
 		)
 		testing_dataset = torch.utils.data.DataLoader(
 			self.D,
@@ -213,7 +213,7 @@ class Routine:
 				self.P['batch_size'],
 				subdivisions[1] - subdivisions[0] if self.P['testing'] else subdivisions[2] - subdivisions[1],
 			), 1),
-			sampler=torch.utils.data.Subset(list(range(
+			sampler=torch.utils.data.SubsetRandomSampler(list(range(
 				subdivisions[0 if self.P['testing'] else 1],
 				subdivisions[1 if self.P['testing'] else 2],
 			))),
@@ -285,5 +285,3 @@ class Routine:
 		# exit
 		if self.P['testing']:
 			clearDirectory(self.R['exports_dir'])
-		wandb.finish()
-		exit()
