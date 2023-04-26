@@ -269,7 +269,10 @@ class Routine:
 										self.R["exports_dir"],
 									)
 						except Exception as e:
-							wandb.log({'error': e})
+							if self.using_wandb:
+								wandb.log({'error': e})
+							else:
+								raise e
 						# early stopping
 						if early_stopping_cache is not None:
 							early_stopping_cache[0].append(self.M.testing_loss['aggregate'])
