@@ -37,11 +37,11 @@ class Parameters(TypedDict, total=True):
 
 
 class RunInfo(TypedDict, total=True):
-	''' Info about the current training run. '''
-	epoch: int
+	''' Info about the current routine. '''
+	epoch: int									# epoch during training or of loaded parameters
 	exports_dir: str							# absolute path to where the model should be saved locally
 	id: str										# this training session's ID
-	model: ModelInfo | None
+	model: ModelInfo | None						# info about the neural model being used
 
 
 class ExportedModel(TypedDict, total=True):

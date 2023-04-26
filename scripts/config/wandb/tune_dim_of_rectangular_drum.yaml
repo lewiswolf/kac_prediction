@@ -6,7 +6,7 @@ metric:
   name: testing_loss.aggregate
 parameters:
   batch_size:
-    values: [1, 2, 4, 5, 8, 12, 16, 24, 32, 64]
+    values: [8, 12, 16, 24, 32, 64, 5000]
   depth:
     values: ['large', 'medium', 'small', 'tiny']
   dropout:

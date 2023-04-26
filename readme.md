@@ -44,14 +44,19 @@ class Routine:
 	Each routine should be implemented as follows.
 
 	# initialise a default routine
-	routine = Routine(exports_dir=..., wandb_config=wandb_config)
+	routine = Routine(
+		# directory to store saved models
+		exports_dir=...,
+		# configuration for wandb
+		wandb_config=...,
+	)
 
 	# initialise parameters
 	routine.setParameters(
 		# default parameters
 		SomeModel.ModelHyperParameters(*args),
 		# yaml config path
-		config_path=config_path,
+		config_path=...,
 	)
 
 	# load, generate or install a dataset
@@ -192,11 +197,11 @@ class Parameters(TypedDict, total=True):
 	with_early_stopping: bool					# should the network stop if it has reached a minima
 
 class RunInfo(TypedDict, total=True):
-	''' Info about the current training run. '''
-	epoch: int
+	''' Info about the current routine. '''
+	epoch: int									# epoch during training or of loaded parameters
 	exports_dir: str							# absolute path to where the model should be saved locally
 	id: str										# this training session's ID
-	model: ModelInfo | None
+	model: ModelInfo | None						# info about the neural model being used
 ```
 
 </details>

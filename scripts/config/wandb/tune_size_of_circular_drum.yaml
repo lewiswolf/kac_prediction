@@ -6,9 +6,9 @@ metric:
   name: testing_loss
 parameters:
   batch_size:
-    values: [1, 2, 4, 5, 8, 12, 16, 24, 32, 64]
+    values: [1, 2, 4, 8, 12, 16, 24, 32, 64, 5000]
   depth:
-    value: 'tiny'
+    value: tiny
   dropout:
     min: 0.0001
     max: 0.25
@@ -18,7 +18,7 @@ parameters:
   num_of_epochs:
     value: 0
   optimiser:
-    values: ['adam', 'sgd']
+    value: adam
   with_early_stopping:
     value: True
     

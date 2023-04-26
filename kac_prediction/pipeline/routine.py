@@ -42,14 +42,19 @@ class Routine:
 	Each routine should be implemented as follows.
 
 	# initialise a default routine
-	routine = Routine(exports_dir=..., wandb_config=wandb_config)
+	routine = Routine(
+		# directory to store saved models
+		exports_dir=...,
+		# configuration for wandb
+		wandb_config=...,
+	)
 
 	# initialise parameters
 	routine.setParameters(
 		# default parameters
 		SomeModel.ModelHyperParameters(*args),
 		# yaml config path
-		config_path=config_path,
+		config_path=...,
 	)
 
 	# load, generate or install a dataset
@@ -83,7 +88,7 @@ class Routine:
 		params:
 			exports_dir		directory for the local model
 			wandb_config	initialise wandb
-							- None is a local call without wandb
+							- {} is a local call without wandb
 							- passing wandb_config is a normal call
 		'''
 		# set device
@@ -169,8 +174,6 @@ class Routine:
 			config_path		path to custom yaml file parameters
 			default			default parameters
 		'''
-		# handle errors
-		assert hasattr(self, 'using_wandb'), 'getRunInfo must be ran before getParameters'
 		# init parameters
 		self.P = {key: value for key, value in default.items()}
 		# load a yaml config file for a single run
@@ -197,7 +200,6 @@ class Routine:
 		assert hasattr(self, 'D'), 'Routine.D: TorchDataset is not set.'
 		assert hasattr(self, 'M'), 'Routine.M: Model is not set - run Routine.setModel().'
 		assert hasattr(self, 'P'), 'Routine.P: Parameters is not set - run Routine.setParameters().'
-		# assert hasattr(self, 'R'), 'Routine.R: RunInfo is not set - run Routine.getRunInfo()'
 		# split dataset
 		subdivisions = [round(self.D.__len__() * p) for p in self.P['dataset_split']]
 		subdivisions[0] += self.D.__len__() - sum(subdivisions) # this correction supposes that split[0] > split[1 or 2]
