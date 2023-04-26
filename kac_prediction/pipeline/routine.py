@@ -248,8 +248,8 @@ class Routine:
 								innerTestingLoop(i, len(testing_dataset), x.to(self.device), y.to(self.device))
 								t_bar.update(1)
 						# save model
-						try:
-							if self.R['epoch'] % 5 == 0 or self.R['epoch'] > 40:
+						if self.R['epoch'] % 5 == 0 or self.R['epoch'] > 40:
+							try:
 								torch.save(ExportedModel({
 									'dataset': {
 										"dataset_size": self.D.__len__(),
@@ -270,11 +270,11 @@ class Routine:
 										os.path.normpath(f'{self.R["exports_dir"]}/epoch_{self.R["epoch"]}.pt'),
 										self.R["exports_dir"],
 									)
-						except Exception as e:
-							if self.using_wandb:
-								wandb.log({'error': e}, step=self.R['epoch'])
-							else:
-								raise e
+							except Exception as e:
+								if self.using_wandb:
+									wandb.log({'error': e}, step=self.R['epoch'])
+								else:
+									raise e
 						# early stopping
 						if early_stopping_cache is not None:
 							early_stopping_cache[0].append(self.M.testing_loss['aggregate'])
