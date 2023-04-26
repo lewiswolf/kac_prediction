@@ -270,7 +270,7 @@ class Routine:
 									)
 						except Exception as e:
 							if self.using_wandb:
-								wandb.log({'error': e})
+								wandb.log({'error': e}, step=self.R['epoch'])
 							else:
 								raise e
 						# early stopping
