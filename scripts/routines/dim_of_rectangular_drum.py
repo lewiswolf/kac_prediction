@@ -120,11 +120,10 @@ def DimOfRectangularDrum(config_path: str = '', wandb_config: dict[str, Any] = {
 			# logs
 			wandb.log({
 				'drum_example': wandb.Html(file_html(Row(children=[truth_fig, pred_fig]), CDN, 'Drum Example.')),
-				'epoch': routine.R['epoch'],
 				'evaluation_loss': routine.M.testing_loss if not routine.P['testing'] else None,
 				'testing_loss': routine.M.testing_loss if routine.P['testing'] else None,
 				'training_loss': routine.M.training_loss,
-			}, commit=True)
+			}, commit=True, step=routine.R['epoch'])
 
 	# train and test a model
 	routine.train(innerTestingLoop)

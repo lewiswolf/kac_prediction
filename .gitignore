@@ -9,4 +9,5 @@ __pycache__
 
 # files
 .DS_Store
+.zenodo
 Pipfile.lock
