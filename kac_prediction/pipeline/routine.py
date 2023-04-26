@@ -191,7 +191,7 @@ class Routine:
 			for i, (x, y) in enumerate(testing_dataset):
 				innerTestingLoop(i, len(testing_dataset), x.to(device), y.to(device))
 		and should somewhere include the line:
-			self.testing_loss += ...
+			self.testing_loss[aggregate] += ...
 		'''
 		# handle errors
 		assert hasattr(self, 'D'), 'Routine.D: TorchDataset is not set.'
@@ -246,27 +246,30 @@ class Routine:
 								innerTestingLoop(i, len(testing_dataset), x.to(self.device), y.to(self.device))
 								t_bar.update(1)
 						# save model
-						if self.R['epoch'] % 5 == 0 or self.R['epoch'] > 40:
-							torch.save(ExportedModel({
-								'dataset': {
-									"dataset_size": self.D.__len__(),
-									"representation_settings": self.D.representation_settings,
-									"sampler": self.D.sampler,
-									"sampler_settings": self.D.sampler_settings,
-								},
-								'evaluation_loss': self.M.testing_loss if not self.P['testing'] else None,
-								'hyperparameters': self.P,
-								'model_state_dict': self.M.state_dict(),
-								'optimizer_state_dict': self.M.optimiser.state_dict(),
-								'run_info': self.R,
-								'testing_loss': self.M.testing_loss if self.P['testing'] else None,
-								'training_loss': self.M.training_loss,
-							}), f'{self.R["exports_dir"]}/epoch_{self.R["epoch"]}.pt')
-							if self.using_wandb:
-								wandb.save(
-									os.path.normpath(f'{self.R["exports_dir"]}/epoch_{self.R["epoch"]}.pt'),
-									self.R["exports_dir"],
-								)
+						try:
+							if self.R['epoch'] % 5 == 0 or self.R['epoch'] > 40:
+								torch.save(ExportedModel({
+									'dataset': {
+										"dataset_size": self.D.__len__(),
+										"representation_settings": self.D.representation_settings,
+										"sampler": self.D.sampler,
+										"sampler_settings": self.D.sampler_settings,
+									},
+									'evaluation_loss': self.M.testing_loss if not self.P['testing'] else None,
+									'hyperparameters': self.P,
+									'model_state_dict': self.M.state_dict(),
+									'optimizer_state_dict': self.M.optimiser.state_dict(),
+									'run_info': self.R,
+									'testing_loss': self.M.testing_loss if self.P['testing'] else None,
+									'training_loss': self.M.training_loss,
+								}), f'{self.R["exports_dir"]}/epoch_{self.R["epoch"]}.pt')
+								if self.using_wandb:
+									wandb.save(
+										os.path.normpath(f'{self.R["exports_dir"]}/epoch_{self.R["epoch"]}.pt'),
+										self.R["exports_dir"],
+									)
+						except Exception as e:
+							wandb.log({'error': e})
 						# early stopping
 						if early_stopping_cache is not None:
 							early_stopping_cache[0].append(self.M.testing_loss['aggregate'])

@@ -76,7 +76,7 @@ def SizeOfCircularDrum(config_path: str = '', wandb_config: dict[str, Any] = {})
 			for i, (x, y) in enumerate(testing_dataset):
 				innerTestingLoop(i, len(testing_dataset), x.to(device), y.to(device))
 		and should somewhere include the line:
-			self.testing_loss += ...
+			self.testing_loss[aggregate] += ...
 		'''
 		# calculate loss
 		y_hat = routine.M(x)
