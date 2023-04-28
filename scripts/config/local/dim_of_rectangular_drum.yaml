@@ -1,8 +1,8 @@
-batch_size: 64
+batch_size: 32
 dataset_split: !!python/tuple [0.7, 0.15, 0.15]
 depth: tiny
-dropout: 0.25
-learning_rate: 0.00025
+dropout: 0.4
+learning_rate: 0.005
 num_of_epochs: 0
 optimiser: adam
 testing: False
