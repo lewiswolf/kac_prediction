@@ -131,17 +131,19 @@ class Routine:
 		that dataset is loaded and transformed if necessary. If the project is run in evaluation mode, the official dataset
 		is downloaded using the zenodo script in /bin. Else a small local dataset is generated for testing.
 		'''
-		# local dataset error
-		class DatasetError(Exception):
-			pass
 		# load a dataset normally
 		try:
 			dataset = transformDataset(loadDataset(dataset_dir=dataset_dir), representation_settings)
+			# handle incompatibility between LocalSampler and imported dataset
 			if LocalSampler is not None and dataset.sampler['name'] != LocalSampler.__name__:
-				raise DatasetError('Default dataset generator does not match the dataset stored in dataset_dir.')
+				printEmojis('😓 WARNING 😓 The specified dataset generator does not match the one imported.')
+				if input('Do you want to generate a new dataset? [y/n] ') == 'y':
+					raise FileNotFoundError
+				else:
+					exit()
 		except Exception as e:
 			# if a metadata.json does not exist...
-			if type(e).__name__ == 'DatasetError' or type(e).__name__ == 'FileNotFoundError':
+			if type(e).__name__ == 'FileNotFoundError':
 				assert dataset_name != '' or LocalSampler is not None, \
 					'importDataset() requires at least a dataset_name or a LocalSampler to produce a dataset.'
 				# import the official dataset for this project

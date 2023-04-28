@@ -84,7 +84,7 @@ def SizeOfCircularDrum(config_path: str = '', wandb_config: dict[str, Any] = {})
 		# log to wandb
 		if routine.using_wandb and i == loop_length - 1:
 			# plots
-			plot_settings: dict[str, Any] = {'height': 300, 'width': 300}
+			plot_settings: dict[str, Any] = {'height': 300, 'width': 300, 'x_range': (-1., 1.), 'y_range': (-1., 1.)}
 			truth_fig = figure(title='Ground Truth', **plot_settings)
 			pred_fig = figure(title='Prediction', **plot_settings)
 			plot_settings = {'fill_color': '#1B9E31', 'line_color': '#126B21', 'x': 0., 'y': 0.}
