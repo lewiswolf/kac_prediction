@@ -87,6 +87,8 @@ def SizeOfCircularDrum(config_path: str = '', wandb_config: dict[str, Any] = {})
 			plot_settings: dict[str, Any] = {'height': 300, 'width': 300, 'x_range': (-1., 1.), 'y_range': (-1., 1.)}
 			truth_fig = figure(title='Ground Truth', **plot_settings)
 			pred_fig = figure(title='Prediction', **plot_settings)
+			truth_fig.title.text_font = 'CMU serif'
+			pred_fig.title.text_font = 'CMU serif'
 			plot_settings = {'fill_color': '#1B9E31', 'line_color': '#126B21', 'x': 0., 'y': 0.}
 			truth_fig.circle(radius=y.detach().cpu().numpy()[0] / 2, **plot_settings)
 			pred_fig.circle(radius=y_hat.detach().cpu().numpy()[0] / 2, **plot_settings)

@@ -115,6 +115,8 @@ def DimOfRectangularDrum(config_path: str = '', wandb_config: dict[str, Any] = {
 				**plot_settings,
 			)
 			plot_settings = {'fill_color': '#1B9E31', 'line_color': '#126B21', 'x': 0., 'y': 0.}
+			truth_fig.title.text_font = 'CMU serif'
+			pred_fig.title.text_font = 'CMU serif'
 			truth_fig.rect(width=y_width, height=y_height, **plot_settings)
 			pred_fig.rect(width=y_hat_width, height=y_hat_height, **plot_settings)
 			# logs
