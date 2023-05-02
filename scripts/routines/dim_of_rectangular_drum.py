@@ -99,7 +99,7 @@ def DimOfRectangularDrum(config_path: str = '', wandb_config: dict[str, Any] = {
 			y_hat_height = y_hat[1] / (y_hat[0] ** 0.5)
 			y_hat_width = y_hat[1] * (y_hat[0] ** 0.5)
 			# plots
-			plot_settings: dict[str, Any] = {'height': 300, 'width': 300}
+			plot_settings: dict[str, Any] = {'height': 300, 'toolbar_location': None, 'width': 300}
 			max_dim = max(2., y_width / 2., y_height / 2.)
 			truth_fig = figure(
 				title='Ground Truth',
@@ -114,9 +114,9 @@ def DimOfRectangularDrum(config_path: str = '', wandb_config: dict[str, Any] = {
 				y_range=(max_dim * -1., max_dim),
 				**plot_settings,
 			)
-			plot_settings = {'fill_color': '#1B9E31', 'line_color': '#126B21', 'x': 0., 'y': 0.}
-			truth_fig.title.text_font = 'CMU serif'
-			pred_fig.title.text_font = 'CMU serif'
+			plot_settings = {'fill_color': '#ffffff', 'line_color': '#101010', 'x': 0., 'y': 0.}
+			truth_fig.title.text_font = truth_fig.axis.major_label_text_font = 'CMU serif'
+			pred_fig.title.text_font = pred_fig.axis.major_label_text_font = 'CMU serif'
 			truth_fig.rect(width=y_width, height=y_height, **plot_settings)
 			pred_fig.rect(width=y_hat_width, height=y_hat_height, **plot_settings)
 			# logs
