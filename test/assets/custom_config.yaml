@@ -1,6 +1,6 @@
 batch_size: 1
 dataset_split: !!python/tuple [0.7, 0.15, 0.15]
 num_of_epochs: 10
-testing: True
+testing: False
 with_early_stopping: True
 some_erroneous_key: False

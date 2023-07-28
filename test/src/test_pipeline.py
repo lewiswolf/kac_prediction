@@ -64,7 +64,7 @@ class PipelineTests(TestCase):
 				'batch_size': 5,
 				'dataset_split': (0.7, 0.15, 0.15),
 				'num_of_epochs': 100,
-				'testing': True,
+				'testing': False,
 				'with_early_stopping': False,
 			}),
 			config_path='',
@@ -73,7 +73,7 @@ class PipelineTests(TestCase):
 			'batch_size': 5,
 			'dataset_split': (0.7, 0.15, 0.15),
 			'num_of_epochs': 100,
-			'testing': True,
+			'testing': False,
 			'with_early_stopping': False,
 		})
 
@@ -84,7 +84,7 @@ class PipelineTests(TestCase):
 				'batch_size': 5,
 				'dataset_split': (0.7, 0.15, 0.15),
 				'num_of_epochs': 100,
-				'testing': True,
+				'testing': False,
 				'with_early_stopping': False,
 			}),
 			config_path=f'{self.asset_dir}/empty_config.yaml',
@@ -93,7 +93,7 @@ class PipelineTests(TestCase):
 			'batch_size': 5,
 			'dataset_split': (0.7, 0.15, 0.15),
 			'num_of_epochs': 100,
-			'testing': True,
+			'testing': False,
 			'with_early_stopping': False,
 		})
 
@@ -113,7 +113,7 @@ class PipelineTests(TestCase):
 			'batch_size': 1,
 			'dataset_split': (0.7, 0.15, 0.15),
 			'num_of_epochs': 10,
-			'testing': True,
+			'testing': False,
 			'with_early_stopping': True,
 		})
 		self.assertFalse(hasattr(routine.P, 'some_erroneous_key'))
@@ -176,18 +176,18 @@ class PipelineTests(TestCase):
 		# These test asserts that exported model has the correct metadata.
 		self.assertEqual(checkpoint['dataset']['dataset_size'], 200)
 		self.assertEqual(checkpoint['dataset']['sampler']['name'], 'TestTone')
-		self.assertTrue(checkpoint['evaluation_loss'] is None)
+		self.assertEqual(checkpoint['evaluation_loss']['aggregate'], 200 * 0.15)
 		self.assertEqual(checkpoint['hyperparameters'], {
 			'batch_size': 1,
 			'dataset_split': (0.7, 0.15, 0.15),
 			'num_of_epochs': 10,
-			'testing': True,
+			'testing': False,
 			'with_early_stopping': True,
 		})
 		self.assertEqual(checkpoint['run_info']['epoch'], 0)
 		self.assertEqual(checkpoint['run_info']['exports_dir'], f'{self.model_dir}/{routine.R["id"]}')
 		self.assertEqual(checkpoint['run_info']['model']['name'], 'SimpleModel')
-		self.assertEqual(checkpoint['testing_loss']['aggregate'], 200 * 0.15)
+		self.assertTrue(checkpoint['testing_loss'] is None)
 		self.assertEqual(checkpoint['training_loss'], 200 * 0.7)
 
 	def test_wandb_routine(self) -> None:
