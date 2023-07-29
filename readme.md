@@ -282,7 +282,7 @@ Then run the example training script using.
 ```bash
 # local
 pipenv run python scripts/train.py
-	usage: train.py [-h] [--config CONFIG] [--testing] [--wandb]
+	usage: train.py [-h] [--config CONFIG] [--wandb]
 	options:
 	-h, --help			show this help message and exit
 	--config CONFIG		path to yaml config file
