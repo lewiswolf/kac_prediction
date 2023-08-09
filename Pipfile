@@ -13,6 +13,7 @@ wandb = ">=0.15"
 bokeh = "*"
 flake8 = "*"
 flake8-commas = "*"
+flake8-quotes = "*"
 kac-prediction = {editable = true, path = "."}
 mypy = "*"
 numpy = "*"

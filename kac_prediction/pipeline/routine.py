@@ -254,10 +254,10 @@ class Routine:
 							try:
 								torch.save(ExportedModel({
 									'dataset': {
-										"dataset_size": self.D.__len__(),
-										"representation_settings": self.D.representation_settings,
-										"sampler": self.D.sampler,
-										"sampler_settings": self.D.sampler_settings,
+										'dataset_size': self.D.__len__(),
+										'representation_settings': self.D.representation_settings,
+										'sampler': self.D.sampler,
+										'sampler_settings': self.D.sampler_settings,
 									},
 									'evaluation_loss': self.M.testing_loss if not self.P['testing'] else None,
 									'hyperparameters': self.P,
@@ -270,7 +270,7 @@ class Routine:
 								if self.using_wandb:
 									wandb.save(
 										os.path.normpath(f'{self.R["exports_dir"]}/epoch_{self.R["epoch"]}.pt'),
-										self.R["exports_dir"],
+										self.R['exports_dir'],
 									)
 							except Exception as e:
 								if self.using_wandb:
