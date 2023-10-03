@@ -5,7 +5,7 @@ Build the kac_prediction module.
 # core
 import codecs
 import os
-from setuptools import setup
+from setuptools import find_packages, setup
 
 
 this = os.path.abspath(os.path.dirname(__file__))
@@ -62,7 +62,7 @@ setup(
 	long_description=long_description,
 	long_description_content_type='text/markdown',
 	name=name,
-	packages=['kac_prediction'],
+	packages=find_packages(where='kac_prediction'),
 	package_data={'kac_prediction': ['py.typed']},
 	version=version,
 )

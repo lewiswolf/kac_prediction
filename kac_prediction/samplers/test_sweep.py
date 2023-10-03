@@ -6,8 +6,7 @@ An AudioSampler() used for generating a sinusoidal sweep of the audio spectrum.
 import numpy as np 			# maths
 
 # src
-from ..dataset import AudioSampler, SamplerSettings
-from ..dataset.utils import classLocalsToKwargs
+from ..dataset import classLocalsToKwargs, AudioSampler, SamplerSettings
 
 __all__ = [
 	'TestSweep',

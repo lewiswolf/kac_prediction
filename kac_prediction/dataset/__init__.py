@@ -5,9 +5,11 @@ from .input_representation import InputRepresentation, RepresentationSettings
 from .load_dataset import loadDataset
 from .regenerate_data_points import regenerateDataPoints
 from .transform_dataset import transformDataset
+from .utils import classLocalsToKwargs
 
 __all__ = [
 	# methods
+	'classLocalsToKwargs',
 	'generateDataset',
 	'loadDataset',
 	'regenerateDataPoints',
@@ -21,5 +23,3 @@ __all__ = [
 	'SamplerSettings',
 	'TorchDataset',
 ]
-
-__all__.append('utils')
