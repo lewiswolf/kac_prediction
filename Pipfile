@@ -4,9 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-kac-drumset = {git = "https://github.com/lewiswolf/kac_drumset.git"}
+numpy = ">=1.26"
+soundfile = "*"
 torch = ">=2.0"
-tqdm = ">=4.65"
+torchaudio = ">=2.0"
+tqdm = ">4.66"
 wandb = ">=0.15"
 
 [dev-packages]
@@ -14,9 +16,9 @@ bokeh = "*"
 flake8 = "*"
 flake8-commas = "*"
 flake8-quotes = "*"
-kac-prediction = {editable = true, path = "."}
+kac-drumset = {ref = "master", git = "https://github.com/lewiswolf/kac_drumset.git"}
+kac-prediction = {file = ".", editable = true}
 mypy = "*"
-numpy = "*"
 requests = "*"
 types-pyyaml = "*"
 types-requests = "*"

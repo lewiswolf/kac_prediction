@@ -5,7 +5,7 @@ Deep learning toolkit for orchestrating and arranging arbitrarily shaped drums.
 # Install
 
 ```bash
-pip install "git+https://github.com/lewiswolf/kac_prediction.git#egg=kac_prediction"
+pip install "git+https://github.com/lewiswolf/kac_prediction.git"
 ```
 
 ### Dependencies
@@ -207,6 +207,176 @@ class RunInfo(TypedDict, total=True):
 </details>
 
 <details>
+<summary>Dataset</summary>
+
+### Import
+
+```python
+from kac_prediction.dataset import (
+	# Methods
+	generateDataset,
+	loadDataset,
+	regenerateDataPoints,
+	transformDataset,
+	# Classes
+	AudioSampler,
+	InputRepresentation,
+	# Types
+	RepresentationSettings,
+	SamplerInfo,
+	SamplerSettings,
+	TorchDataset,
+)
+```
+
+### Methods
+
+```python
+def generateDataset(
+	Sampler: Type[AudioSampler],
+	sampler_settings: SamplerSettings,
+	dataset_dir: str,
+	dataset_size: int = 10,
+	representation_settings: RepresentationSettings | None = None,
+) -> TorchDataset:
+	'''
+	Generates a dataset of audio samples. The generated dataset, including the individual .wav files and the metadata.json,
+	are saved in the directory specified by the absolute filepath dataset_dir.
+	'''
+
+def loadDataset(dataset_dir: str) -> TorchDataset:
+	'''
+	loadDataset imports a kac_drumset dataset from the directory specified by the absolute path dataset_dir.
+	'''
+
+def regenerateDataPoints(dataset: TorchDataset, Sampler: type[AudioSampler], entries: list[int]) -> TorchDataset:
+	'''
+	This method regenerates specific indices of a dataset.
+	'''
+
+def transformDataset(dataset: TorchDataset, representation_settings: RepresentationSettings) -> TorchDataset:
+	'''
+	transformDataset is used to transform the input representation of a loaded dataset. This method rewrites the
+	metadata.json for the dataset, such that the dataset will be loaded with the new settings upon future use.
+	'''
+```
+
+### Classes
+
+```python
+class AudioSampler(ABC):
+	''' Abstract parent class for an audio sampler. '''
+
+	duration: float						# duration of the audio file (seconds)
+	length: int							# length of the audio file (samples)
+	sample_rate: int					# sample rate
+	waveform: npt.NDArray[np.float64]	# the audio sample itself
+
+	def export(self, absolutePath: str, bit_depth: Literal[16, 24, 32] = 24) -> None:
+		''' Write the generated waveform to a .wav file. '''
+
+	@abstractmethod
+	def generateWaveform(self) -> None:
+		''' This method should be used to generate and set self.waveform. '''
+
+	@abstractmethod
+	def getLabels(self) -> dict[str, list[float | int]]:
+		''' This method should return the y labels for the generated audio. '''
+
+	@abstractmethod
+	def updateProperties(self, i: int | None]) -> None:
+		''' This method should be used to update the properties of the sampler when inside a generator loop. '''
+
+	@abstractmethod
+	class Settings(SamplerSettings, total=False):
+		'''
+		This is an abstract TypedDict used to mirror the type declaration for the customised __init__() method. This allows
+		for type safety when using a custom AudioSampler with an arbitrary __init__() method.
+		'''
+
+class InputRepresentation():
+	'''
+	This class is used to convert a raw waveform into a user defined input representation, which includes end2end, the
+	fourier transform, and a mel spectrogram.
+	'''
+
+	settings: RepresentationSettings
+
+	def __init__(self, sample_rate: int, settings: RepresentationSettings | None = None) -> None:
+		'''
+		InputRepresentation works by creating a variably defined method self.transform. This method uses the input settings to
+		generate the correct input representation of the data.
+		'''
+
+	def transform(self, waveform: npt.NDArray[np.float64]) -> torch.Tensor:
+		''' Produce the output representation. '''
+
+	@staticmethod
+	def normalise(waveform: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+		''' Normalise an audio waveform, such that x ∈ [-1.0, 1.0] '''
+
+	@staticmethod
+	def transformShape(data_length: int, settings: RepresentationSettings) -> tuple[int, ...]:
+		''' This method uses the length of the incoming audio data to calculate the size of the transform's output. '''
+```
+
+### Types
+
+```python
+class RepresentationSettings(TypedDict, total=False):
+	'''
+	These settings are used to specify the data representation of audio, providing the option for end to end data, as well
+	as Fourier and Mel transformations. An FFT is calculated using n_bins for the number of frequency bins, as well as
+	window_length and hop_length for the size of the bins. The Mel representation uses the same settings as the FFT, with
+	the addition of n_mels, the number of mel frequency bins, and f_min, the minimum frequency of the transform.
+	'''
+
+	f_min: float			# minimum frequency of the transform in hertz (mel only)
+	hop_length: int			# hop length in samples
+	n_bins: int				# number of frequency bins for the spectral density function
+	n_mels: int				# number of mel frequency bins (mel only)
+	normalise_input: bool	# should the input be normalised
+	output_type: Literal[	# representation type
+		'end2end',
+		'fft',
+		'mel',
+	]
+	window_length: int		# window length in samples
+
+class SamplerInfo(TypedDict, total=True):
+	'''
+	Information about the sampler used to generate a specific dataset.
+	'''
+	name: str		# name of the sampler
+	version: str	# version of kac_drumset when the sampler was generated
+
+class SamplerSettings(TypedDict, total=True):
+	'''
+	These are the minimum requirements for the AudioSampler __init__() method. This type is used to maintain type safety
+	when using a custom AudioSampler.
+	'''
+	duration: float		# duration of the audio file (seconds)
+	sample_rate: int	# sample rate
+
+class TorchDataset(torch.utils.data.Dataset):
+	''' PyTorch wrapper for a dataset. '''
+
+	dataset_dir: str									# dataset directory
+	representation_settings: RepresentationSettings		# settings for InputRepresentation
+	sampler: SamplerInfo								# the name of the sampler used to generate the dataset
+	sampler_settings: dict[str, Any]					# settings for the sampler
+	X: torch.Tensor										# data
+	Y: list[dict[str, torch.Tensor]]					# labels
+
+	def __getitem__(self, i: int) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
+		''' Return the data and its labels at index i. '''
+
+	def __len__(self) -> int:
+		''' Return the dataset size. '''
+```
+</details>
+
+<details>
 <summary>Models</summary>
 
 ### Import
@@ -293,8 +463,44 @@ pipenv run wandb sweep scripts/config/wandb/...
 pipenv run wandb agent ...
 ```
 
-### Test
+### Deploy a Trained Model
+
+```bash
+pipenv run python scripts/deploy.py
+```
+
+### Test Codebase
 
 ```bash
 pipenv run test
 ```
+
+<details><summary>Testing Library</summary>
+
+### Import
+
+```python
+from kac_prediction.samplers import (
+	TestSweep,
+	TestTone,
+)
+```
+
+### Samplers
+
+```python
+class TestSweep(AudioSampler):
+	'''
+	This class produces a sine wave sweep across the audio spectrum, from 20hz to f_s / 2.
+	'''
+		
+class TestTone(AudioSampler):
+	'''
+	This class produces an arbitrary test tone, using either a sawtooth, sine, square or triangle waveform. If it's initial frequency is not set, it will automatically create random frequencies.
+	'''
+
+	class Settings(SamplerSettings, total=False):
+		f_0: float										# fixed fundamental frequency (hz)
+		waveshape: Literal['saw', 'sin', 'sqr', 'tri']	# shape of the waveform
+```
+</details>

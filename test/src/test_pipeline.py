@@ -9,8 +9,7 @@ import torch	# pytorch
 import wandb	# experiment tracking
 
 # src
-from kac_drumset import TestTone, TorchDataset
-from kac_drumset.utils import clearDirectory, withoutPrinting
+from kac_prediction.dataset import TorchDataset
 from kac_prediction.pipeline import (
 	# classes
 	Routine,
@@ -19,6 +18,9 @@ from kac_prediction.pipeline import (
 	Datasets,
 	Parameters,
 )
+from kac_prediction.samplers import TestTone
+from kac_prediction.utils import clearDirectory
+from .utils import withoutPrinting
 
 
 class PipelineTests(TestCase):

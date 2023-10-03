@@ -11,8 +11,9 @@ import torch						# pytorch
 import wandb						# experiment tracking
 
 # src
-from kac_drumset import BesselModel, RepresentationSettings
+from kac_drumset import BesselModel
 from kac_prediction.architecture import CRePE
+from kac_prediction.dataset import RepresentationSettings
 from kac_prediction.pipeline import Routine
 
 __all__ = ['SizeOfCircularDrum']

@@ -10,7 +10,7 @@ from typing import Any
 import torch
 
 # src
-from ..pipeline.types import Parameters
+from .types import Parameters
 
 __all__ = ['Model']
 

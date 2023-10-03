@@ -10,7 +10,7 @@ from setuptools import setup
 
 this = os.path.abspath(os.path.dirname(__file__))
 name = 'kac_prediction'
-version = '0.0.1'
+version = '1.0.0'
 short_description = 'Neural networks designed for working with arbitrarily shaped drums.'
 
 # import long description from readme.md

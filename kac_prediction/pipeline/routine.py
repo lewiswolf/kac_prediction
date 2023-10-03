@@ -22,18 +22,16 @@ import wandb			# experiment tracking
 # src
 from .model import Model
 from .types import Datasets, ExportedModel, Parameters, RunInfo
-from kac_drumset import (
-	# methods
+from ..dataset import (
 	generateDataset,
 	loadDataset,
 	transformDataset,
-	# types
 	AudioSampler,
 	RepresentationSettings,
 	SamplerSettings,
 	TorchDataset,
 )
-from kac_drumset.utils import clearDirectory, printEmojis
+from ..utils import clearDirectory, printEmojis, tqdm_format
 
 
 class Routine:
@@ -123,7 +121,7 @@ class Routine:
 		dataset_dir: str,
 		dataset_name: Datasets | Literal[''] = '',
 		LocalSampler: type[AudioSampler] | None = None,
-		representation_settings: RepresentationSettings = {},
+		representation_settings: RepresentationSettings | None = None,
 		sampler_settings: SamplerSettings = {'duration': 1., 'sample_rate': 48000},
 	) -> None:
 		'''
@@ -131,6 +129,7 @@ class Routine:
 		that dataset is loaded and transformed if necessary. If the project is run in evaluation mode, the official dataset
 		is downloaded using the zenodo script in /bin. Else a small local dataset is generated for testing.
 		'''
+		representation_settings = {} if representation_settings is None else representation_settings
 		# load a dataset normally
 		try:
 			dataset = transformDataset(loadDataset(dataset_dir=dataset_dir), representation_settings)
@@ -228,10 +227,9 @@ class Routine:
 			wandb.watch(self.M, log_freq=1000)
 		self.M = self.M.to(self.device)
 		early_stopping_cache: tuple[list[float], float] | None = ([], 10.) if self.P['with_early_stopping'] else None
-		bar_format: str = '{percentage:3.0f}% |{bar}| {n_fmt}/{total_fmt}, Elapsed: {elapsed}, ETA: {remaining}, {rate_fmt} '
-		with tqdm(bar_format=bar_format, total=self.P['num_of_epochs'], unit='  epochs') as epoch_bar:
-			with tqdm(bar_format=bar_format, total=len(training_dataset), unit=' batches') as i_bar:
-				with tqdm(bar_format=bar_format, total=len(testing_dataset), unit=' batches') as t_bar:
+		with tqdm(bar_format=tqdm_format, total=self.P['num_of_epochs'], unit='  epochs') as epoch_bar:
+			with tqdm(bar_format=tqdm_format, total=len(training_dataset), unit=' batches') as i_bar:
+				with tqdm(bar_format=tqdm_format, total=len(testing_dataset), unit=' batches') as t_bar:
 					while self.P['num_of_epochs'] == 0 or self.R['epoch'] < self.P['num_of_epochs']:
 						# initialise
 						i_bar.reset()

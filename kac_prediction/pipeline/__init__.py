@@ -13,4 +13,3 @@ __all__ = [
 	'Parameters',
 	'RunInfo',
 ]
-__all__.append('types')
