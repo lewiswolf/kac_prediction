@@ -15,7 +15,7 @@ pip install "git+https://github.com/lewiswolf/kac_prediction.git"
 
 # Usage
 
-The design of this library hinges on the motif of abstracting repetitive blocks of code. This is achieved by condensing the entire training routine of a single neural network into a class `Routine`. All example of usages of this class, including for other classes in this library and production use cases, can be seen in the `/scripts` directory.
+The design of this library hinges on the motif of abstracting repetitive blocks of code. This is achieved by condensing the entire training routine of a single neural network into a class `Routine`. All example of usages of this class, including for other classes in this library and production use cases, can be seen in the `/scripts` directory. Similarly, this package comes equipped with a customisable class `AudioSampler`, which can be used to create a dataset of synthesised audio samples.
 
 <details>
 <summary>Core Library</summary>
@@ -271,6 +271,15 @@ class AudioSampler(ABC):
 	length: int							# length of the audio file (samples)
 	sample_rate: int					# sample rate
 	waveform: npt.NDArray[np.float64]	# the audio sample itself
+
+	def __inti__(self, duration: float, sample_rate: int, any_other_custom_kwargs: Any) -> None:
+		'''
+		When defining a custom audio sampler, you must call the below method so as to save your custom kwargs as part of 
+		the metadata.json. In special cases, where the kwarg type is not a basic type (float, string, etc.), you may wish
+		to amend the return value of classLocalsToKwargs.
+		'''
+		from kac_prediction.dataset import classLocalsToKwargs
+		super().__init__(**classLocalsToKwargs(locals()))
 
 	def export(self, absolutePath: str, bit_depth: Literal[16, 24, 32] = 24) -> None:
 		''' Write the generated waveform to a .wav file. '''
