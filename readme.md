@@ -272,7 +272,7 @@ class AudioSampler(ABC):
 	sample_rate: int					# sample rate
 	waveform: npt.NDArray[np.float64]	# the audio sample itself
 
-	def __inti__(self, duration: float, sample_rate: int, any_other_custom_kwargs: Any) -> None:
+	def __init__(self, duration: float, sample_rate: int, any_other_custom_kwargs: Any) -> None:
 		'''
 		When defining a custom audio sampler, you must call the below method so as to save your custom kwargs as part of 
 		the metadata.json. In special cases, where the kwarg type is not a basic type (float, string, etc.), you may wish
