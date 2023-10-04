@@ -21,7 +21,7 @@ import wandb			# experiment tracking
 
 # src
 from .model import Model
-from .types import Datasets, ExportedModel, Parameters, RunInfo
+from .types import ExportedModel, Parameters, RunInfo
 from ..dataset import (
 	generateDataset,
 	loadDataset,
@@ -31,6 +31,7 @@ from ..dataset import (
 	SamplerSettings,
 	TorchDataset,
 )
+from ..samplers import Datasets
 from ..utils import clearDirectory, printEmojis, tqdm_format
 
 

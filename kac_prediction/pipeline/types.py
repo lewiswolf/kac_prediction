@@ -3,21 +3,12 @@ Utility types used throughout this code base.
 '''
 
 # core
-from typing import Any, Literal, TypeAlias, TypedDict
+from typing import Any, TypedDict
 
 __all__ = [
-	'Datasets',
 	'ExportedModel',
 	'Parameters',
 	'RunInfo',
-]
-
-
-# string literals for installable datasets
-Datasets: TypeAlias = Literal[
-	'2000-convex-polygonal-drums-of-varying-size',
-	'5000-circular-drums-of-varying-size',
-	'5000-rectangular-drums-of-varying-dimension',
 ]
 
 

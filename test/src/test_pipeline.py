@@ -15,10 +15,9 @@ from kac_prediction.pipeline import (
 	Routine,
 	Model,
 	# types
-	Datasets,
 	Parameters,
 )
-from kac_prediction.samplers import TestTone
+from kac_prediction.samplers import Datasets, TestTone
 from kac_prediction.utils import clearDirectory
 from .utils import withoutPrinting
 

@@ -24,10 +24,9 @@ The design of this library hinges on the motif of abstracting repetitive blocks 
 
 ```python
 from kac_prediction.pipeline import (
-	# classes
+	# Classes
 	Routine,
-	# types
-	Datasets,
+	# Types
 	ExportedModel,
 	Model,
 	Parameters,
@@ -135,13 +134,6 @@ class Routine:
 ### Types
 
 ```python
-# string literals for installable datasets
-Datasets: TypeAlias = Literal[
-	'2000-convex-polygonal-drums-of-varying-size',
-	'5000-circular-drums-of-varying-size',
-	'5000-rectangular-drums-of-varying-dimension',
-]
-
 class ExportedModel(TypedDict, total=True):
 	''' All the info needed to save and load a model. '''
 	dataset: dict[str, Any]						# metadata imported from TorchDataset
@@ -432,6 +424,50 @@ class CRePE(Model):
 
 </details>
 
+<details><summary>Samplers</summary>
+
+### Import
+
+```python
+from kac_prediction.samplers import (
+	# Types
+	Datasets
+	# Samplers
+	TestSweep,
+	TestTone,
+)
+```
+
+### Types
+
+```python
+# string literals for installable datasets
+Datasets: TypeAlias = Literal[
+	'2000-convex-polygonal-drums-of-varying-size',
+	'5000-circular-drums-of-varying-size',
+	'5000-rectangular-drums-of-varying-dimension',
+]
+```
+
+### Samplers
+
+```python
+class TestSweep(AudioSampler):
+	'''
+	This class produces a sine wave sweep across the audio spectrum, from 20hz to f_s / 2.
+	'''
+		
+class TestTone(AudioSampler):
+	'''
+	This class produces an arbitrary test tone, using either a sawtooth, sine, square or triangle waveform. If it's initial frequency is not set, it will automatically create random frequencies.
+	'''
+
+	class Settings(SamplerSettings, total=False):
+		f_0: float										# fixed fundamental frequency (hz)
+		waveshape: Literal['saw', 'sin', 'sqr', 'tri']	# shape of the waveform
+```
+</details>
+
 # Development / Local Training
 
 ### Dependencies
@@ -483,33 +519,3 @@ pipenv run python scripts/deploy.py
 ```bash
 pipenv run test
 ```
-
-<details><summary>Testing Library</summary>
-
-### Import
-
-```python
-from kac_prediction.samplers import (
-	TestSweep,
-	TestTone,
-)
-```
-
-### Samplers
-
-```python
-class TestSweep(AudioSampler):
-	'''
-	This class produces a sine wave sweep across the audio spectrum, from 20hz to f_s / 2.
-	'''
-		
-class TestTone(AudioSampler):
-	'''
-	This class produces an arbitrary test tone, using either a sawtooth, sine, square or triangle waveform. If it's initial frequency is not set, it will automatically create random frequencies.
-	'''
-
-	class Settings(SamplerSettings, total=False):
-		f_0: float										# fixed fundamental frequency (hz)
-		waveshape: Literal['saw', 'sin', 'sqr', 'tri']	# shape of the waveform
-```
-</details>
