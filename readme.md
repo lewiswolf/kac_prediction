@@ -540,5 +540,6 @@ pipenv run test
   month = nov,
   publisher = {{Zenodo}},
   copyright = {All rights reserved}
+  doi = {10.5281/zenodo.7057219}
 }
 ```
