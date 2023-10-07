@@ -519,3 +519,27 @@ pipenv run python scripts/deploy.py
 ```bash
 pipenv run test
 ```
+
+# Related Works
+
+```bibtex
+@inproceedings{wolstanholmeOrchestratingPhysicallyModelled2023,
+  title = {Towards Orchestrating Physically Modelled {{2D}} Percussion Instruments},
+  booktitle = {10th {{Convention}} of the {{European Acoustics Association}} ({{Forum Acusticum}})},
+  author = {Wolstanholme, Lewis and McPherson, Andrew},
+  year = {2023},
+  month = sep,
+  publisher = {{Turin, Italy}},
+  copyright = {All rights reserved}
+}
+
+@misc{wolstanholmeKac_drumsetDatasetGenerator2022,
+  title = {{{kac\_drumset}}: {{A}} Dataset Generator for Arbitrarily Shaped Drums},
+  author = {Wolstanholme, Lewis},
+  year = {2022},
+  month = nov,
+  publisher = {{Zenodo}},
+  copyright = {All rights reserved}
+}
+
+```
