@@ -541,5 +541,4 @@ pipenv run test
   publisher = {{Zenodo}},
   copyright = {All rights reserved}
 }
-
 ```
