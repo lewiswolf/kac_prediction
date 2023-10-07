@@ -539,7 +539,7 @@ pipenv run test
   year = {2022},
   month = nov,
   publisher = {{Zenodo}},
+  doi = {10.5281/zenodo.7057219},
   copyright = {All rights reserved}
-  doi = {10.5281/zenodo.7057219}
 }
 ```
