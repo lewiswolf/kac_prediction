@@ -486,10 +486,7 @@ conda activate kac
 ### Install
 
 ```bash
-git clone ...
 pipenv install -d
-# then for targetting gpus and linux distros
-pipenv run pip install torch torchaudio --index-url ...
 ```
 
 ### Training Commands
