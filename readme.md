@@ -12,6 +12,7 @@ pip install "git+https://github.com/lewiswolf/kac_prediction.git"
 
 -	[cmake](https://formulae.brew.sh/formula/cmake)
 -	[curl](https://formulae.brew.sh/formula/curl)
+-   [libsndfile](https://github.com/libsndfile/libsndfile)
 
 # Usage
 
@@ -473,6 +474,14 @@ class TestTone(AudioSampler):
 ### Dependencies
 
 -   [pipenv](https://formulae.brew.sh/formula/pipenv#default)
+- 	[PyTorch with CUDA enabled](https://pytorch.org/get-started/locally/)
+
+If you're using conda:
+
+```bash
+conda env create -f environment.yml
+conda activate kac
+```
 
 ### Install
 
