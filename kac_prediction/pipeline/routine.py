@@ -228,7 +228,11 @@ class Routine:
 			wandb.watch(self.M, log_freq=1000)
 		self.M = self.M.to(self.device)
 		early_stopping_cache: tuple[list[float], float] | None = ([], 10.) if self.P['with_early_stopping'] else None
-		with tqdm(bar_format=tqdm_format, total=self.P['num_of_epochs'], unit='  epochs') as epoch_bar:
+		with tqdm(
+			bar_format=tqdm_format[:-2] + ', Loss: {postfix}  ',
+			total=self.P['num_of_epochs'],
+			unit='epoch',
+		) as epoch_bar:
 			with tqdm(bar_format=tqdm_format, total=len(training_dataset), unit=' batches') as i_bar:
 				with tqdm(bar_format=tqdm_format, total=len(testing_dataset), unit=' batches') as t_bar:
 					while self.P['num_of_epochs'] == 0 or self.R['epoch'] < self.P['num_of_epochs']:
@@ -276,6 +280,9 @@ class Routine:
 									wandb.log({'error': e}, step=self.R['epoch'])
 								else:
 									raise e
+						# cleanup
+						if torch.cuda.is_available():
+							torch.cuda.empty_cache()
 						# early stopping
 						if early_stopping_cache is not None:
 							early_stopping_cache[0].append(self.M.testing_loss['aggregate'])
@@ -285,10 +292,10 @@ class Routine:
 							)
 							if self.R['epoch'] > 32 and (min(early_stopping_cache[0]) > early_stopping_cache[1]):
 								break
-						# cleanup
-						if torch.cuda.is_available():
-							torch.cuda.empty_cache()
 						# progress bar
+							epoch_bar.postfix = early_stopping_cache[1]
+						else:
+							epoch_bar.postfix = self.M.testing_loss['aggregate']
 						epoch_bar.update(1)
 						self.R['epoch'] += 1
 		# exit
