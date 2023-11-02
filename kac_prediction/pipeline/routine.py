@@ -106,7 +106,7 @@ class Routine:
 			local_id = wandb.run.id
 		# create local id and exports_dir
 		else:
-			local_id = ''.join(random.choice(string.ascii_letters) for x in range(10))
+			local_id = ''.join(random.choice(string.ascii_letters + string.digits) for x in range(10))
 			exports_dir = f'{exports_dir if exports_dir != "" else "."}/{local_id}'
 			os.makedirs(exports_dir)
 		# create RunInfo
