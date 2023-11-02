@@ -41,6 +41,7 @@ def SizeOfCircularDrum(config_path: str = '', wandb_config: dict[str, Any] = {})
 			'learning_rate': 1e-3,
 			'num_of_epochs': 50,
 			'optimiser': 'sgd',
+			'outputs': 1,
 			'testing': True,
 			'with_early_stopping': True,
 		}),
@@ -54,7 +55,7 @@ def SizeOfCircularDrum(config_path: str = '', wandb_config: dict[str, Any] = {})
 		dropout=routine.P['dropout'],
 		learning_rate=routine.P['learning_rate'],
 		optimiser=routine.P['optimiser'],
-		outputs=1,
+		outputs=routine.P['outputs'],
 	))
 
 	# load, generate or install a dataset

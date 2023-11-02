@@ -25,6 +25,8 @@ The design of this library hinges on the motif of abstracting repetitive blocks 
 
 ```python
 from kac_prediction.pipeline import (
+	# Methods
+	loadModel,
 	# Classes
 	Routine,
 	# Types
@@ -33,6 +35,19 @@ from kac_prediction.pipeline import (
 	Parameters,
 	RunInfo,
 )
+```
+
+### Methods
+
+```python
+def loadModel(Model: type[torch.nn.Module], path_to_parameters: str, url: str | None = None) -> torch.nn.Module:
+	'''
+	This method can load a model using parameters derived from multiple locations. Firstly, if you have supplied a
+	directory of .pt files, the method will load the parameters with the lowest testing_loss. If you have provided a path
+	directly to a specific .pt, the method will load that file instead. And finally, if your supplied path is not a
+	directory, but is a .pt file that does not yet exist, you can provide the optional argument url to download these
+	parameters for your model and store them at this location.
+	'''
 ```
 
 ### Classes
@@ -518,6 +533,10 @@ pipenv run wandb agent ...
 
 ```bash
 pipenv run python scripts/deploy.py
+	usage: deploy.py [-h] [--url URL]
+	options:
+	-h, --help			show this help message and exit
+	--urk URL			url to a model parameter file
 ```
 
 ### Test Codebase

@@ -29,6 +29,7 @@ class CRePE(Model):
 		dropout: float
 		learning_rate: float
 		optimiser: Literal['adam', 'sgd']
+		outputs: int
 
 	class ConvLayer(torch.nn.Module):
 		'''

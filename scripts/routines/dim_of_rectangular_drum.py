@@ -42,6 +42,7 @@ def DimOfRectangularDrum(config_path: str = '', wandb_config: dict[str, Any] = {
 			'learning_rate': 1e-3,
 			'num_of_epochs': 50,
 			'optimiser': 'sgd',
+			'outputs': 2,
 			'testing': True,
 			'with_early_stopping': True,
 		}),
@@ -55,7 +56,7 @@ def DimOfRectangularDrum(config_path: str = '', wandb_config: dict[str, Any] = {
 		dropout=routine.P['dropout'],
 		learning_rate=routine.P['learning_rate'],
 		optimiser=routine.P['optimiser'],
-		outputs=2,
+		outputs=routine.P['outputs'],
 	))
 
 	# load, generate or install a dataset
@@ -69,7 +70,7 @@ def DimOfRectangularDrum(config_path: str = '', wandb_config: dict[str, Any] = {
 
 	# shape data
 	routine.D.X = torch.narrow(routine.D.X, 1, 0, 1024)
-	routine.D.Y = torch.tensor([[y['aspect_ratio'], y['drum_size']] for y in routine.D.Y]) # type: ignore
+	routine.D.Y = torch.tensor([[y['drum_size'], y['aspect_ratio']] for y in routine.D.Y]) # type: ignore
 
 	# define how the model is to be tested
 	def innerTestingLoop(i: int, loop_length: float, x: torch.Tensor, y: torch.Tensor) -> None:
@@ -88,17 +89,17 @@ def DimOfRectangularDrum(config_path: str = '', wandb_config: dict[str, Any] = {
 			})
 		y_hat = routine.M(x)
 		routine.M.testing_loss['aggregate'] += routine.M.criterion(y, y_hat).item() / loop_length
-		routine.M.testing_loss['aspect_ratio'] += routine.M.criterion(y[0], y_hat[0]).item() / loop_length
-		routine.M.testing_loss['size'] += routine.M.criterion(y[1], y_hat[1]).item() / loop_length
+		routine.M.testing_loss['size'] += routine.M.criterion(y[0], y_hat[0]).item() / loop_length
+		routine.M.testing_loss['aspect_ratio'] += routine.M.criterion(y[1], y_hat[1]).item() / loop_length
 		# log to wandb
 		if routine.using_wandb and i == loop_length - 1:
 			# rectangle properties
 			y = y.detach().cpu().numpy()[0]
-			y_height = y[1] / (y[0] ** 0.5)
-			y_width = y[1] * (y[0] ** 0.5)
+			y_height = y[0] / (y[1] ** 0.5)
+			y_width = y[0] * (y[1] ** 0.5)
 			y_hat = np.abs(y_hat.detach().cpu().numpy()[0])
-			y_hat_height = y_hat[1] / (y_hat[0] ** 0.5)
-			y_hat_width = y_hat[1] * (y_hat[0] ** 0.5)
+			y_hat_height = y_hat[0] / (y_hat[1] ** 0.5)
+			y_hat_width = y_hat[0] * (y_hat[1] ** 0.5)
 			# plots
 			plot_settings: dict[str, Any] = {'height': 300, 'toolbar_location': None, 'width': 300}
 			max_dim = max(2., y_width / 2., y_height / 2.)

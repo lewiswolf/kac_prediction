@@ -11,6 +11,8 @@ import wandb	# experiment tracking
 # src
 from kac_prediction.dataset import TorchDataset
 from kac_prediction.pipeline import (
+	# methods
+	loadModel,
 	# classes
 	Routine,
 	Model,
@@ -172,8 +174,8 @@ class PipelineTests(TestCase):
 			routine.train(innerTestingLoop)
 
 		# This test asserts the training routine correctly exported a model checkpoint.
-		self.assertTrue(os.path.isfile(f'{routine.R["exports_dir"]}/epoch_0.pt'))
-		checkpoint = torch.load(f'{routine.R["exports_dir"]}/epoch_0.pt')
+		self.assertTrue(os.path.isfile(f'{routine.R["exports_dir"]}/epoch_000.pt'))
+		checkpoint = torch.load(f'{routine.R["exports_dir"]}/epoch_000.pt')
 		# These test asserts that exported model has the correct metadata.
 		self.assertEqual(checkpoint['dataset']['dataset_size'], 200)
 		self.assertEqual(checkpoint['dataset']['sampler']['name'], 'TestTone')
@@ -190,6 +192,14 @@ class PipelineTests(TestCase):
 		self.assertEqual(checkpoint['run_info']['model']['name'], 'SimpleModel')
 		self.assertTrue(checkpoint['testing_loss'] is None)
 		self.assertEqual(checkpoint['training_loss'], 200 * 0.7)
+
+		# this test asserts the model parameters can be reliably loaded
+		loaded_model = loadModel(SimpleModel, os.path.join(routine.R['exports_dir'], 'epoch_005.pt'))
+		x = routine.D.__getitem__(0)[0]
+		self.assertEqual(
+			loaded_model(x[-1024:].view(1, -1)).tolist()[0][0],
+			routine.M(x[-1024:].view(1, -1)).tolist()[0][0],
+		)
 
 	def test_wandb_routine(self) -> None:
 		'''

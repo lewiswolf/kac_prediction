@@ -269,10 +269,10 @@ class Routine:
 									'run_info': self.R,
 									'testing_loss': self.M.testing_loss if self.P['testing'] else None,
 									'training_loss': self.M.training_loss,
-								}), f'{self.R["exports_dir"]}/epoch_{self.R["epoch"]}.pt')
+								}), f'{self.R["exports_dir"]}/epoch_{self.R["epoch"]:03d}.pt')
 								if self.using_wandb:
 									wandb.save(
-										os.path.normpath(f'{self.R["exports_dir"]}/epoch_{self.R["epoch"]}.pt'),
+										os.path.normpath(f'{self.R["exports_dir"]}/epoch_{self.R["epoch"]:03d}.pt'),
 										self.R['exports_dir'],
 									)
 							except Exception as e:
