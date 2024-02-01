@@ -554,8 +554,10 @@ pipenv run test
   author = {Wolstanholme, Lewis and McPherson, Andrew},
   year = {2023},
   month = sep,
-  publisher = {{Turin, Italy}},
-  copyright = {All rights reserved}
+  pages = {2193--2200},
+  publisher = {{European Acoustics Association}},
+  address = {{Turin, Italy}},
+  doi = {10.61782/fa.2023.0664},
 }
 
 @misc{wolstanholmeKac_drumsetDatasetGenerator2022,
@@ -565,6 +567,5 @@ pipenv run test
   month = nov,
   publisher = {{Zenodo}},
   doi = {10.5281/zenodo.7057219},
-  copyright = {All rights reserved}
 }
 ```
