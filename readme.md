@@ -523,7 +523,7 @@ pipenv run python scripts/train.py
 	usage: train.py [-h] [--config CONFIG] [--wandb]
 	options:
 	-h, --help			show this help message and exit
-	--config CONFIG		path to yaml config file
+	--config CONFIG			path to yaml config file
 	--wandb				log to wandb
 
 # wandb
