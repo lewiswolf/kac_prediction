@@ -52,11 +52,16 @@ jobs:
             - name: Install python dependencies
               run: pipenv install -d --python ${{ matrix.python }}
 
-            - name: Lint project
+            - name: Lint project 3.11
+              if: ${{ matrix.python == '3.11' }}
               run: pipenv run flake8 --config=test/test.cfg
+
+            - name: Lint project 3.12
+              if: ${{ matrix.python == '3.12' }}
+              run: pipenv run flake8 --config=test/test.cfg --ignore=Q000
 
             - name: Assert types
               run: pipenv run mypy --config-file=test/test.cfg
 
-            # - name: Run unit tests
-            #   run: pipenv run python test/test.py
+            - name: Run unit tests
+              run: pipenv run python test/test.py
