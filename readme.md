@@ -538,7 +538,7 @@ pipenv run python scripts/deploy.py
 	usage: deploy.py [-h] [--url URL]
 	options:
 	-h, --help			show this help message and exit
-	--urk URL			url to a model parameter file
+	--url URL			url to a model parameter file
 ```
 
 ### Test Codebase
