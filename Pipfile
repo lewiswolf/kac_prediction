@@ -6,10 +6,10 @@ name = "pypi"
 [packages]
 numpy = ">=1.26"
 soundfile = "*"
-torch = ">=2.0"
-torchaudio = ">=2.0"
+torch = ">=2.2"
+torchaudio = ">=2.2"
 tqdm = ">4.66"
-wandb = ">=0.15"
+wandb = ">=0.16"
 
 [dev-packages]
 bokeh = "*"
