@@ -18,8 +18,8 @@ jobs:
                 python: ["3.11", "3.12"]
 
         steps:
-            - uses: actions/checkout@master
-            - uses: actions/setup-python@v4
+            - uses: actions/checkout@v4
+            - uses: actions/setup-python@v5
               with:
                   python-version: ${{ matrix.python }}
 
@@ -34,13 +34,13 @@ jobs:
                 python: ["3.11", "3.12"]
 
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
               with:
                   submodules: recursive
-            - uses: actions/setup-python@v4
+            - uses: actions/setup-python@v5
               with:
                   python-version: ${{ matrix.python }}
-            - uses: actions/cache@v3
+            - uses: actions/cache@v4
               id: cache-pipenv
               with:
                   path: ~/.local/share/virtualenvs

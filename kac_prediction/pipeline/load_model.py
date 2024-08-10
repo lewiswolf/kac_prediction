@@ -30,7 +30,7 @@ def loadModel(Model: type[torch.nn.Module], path_to_parameters: str, url: str | 
 			testing_loss = 10
 			optimum_path = 'parameters.pt'
 			for path in os.listdir(path_to_parameters):
-				params_tmp = torch.load(os.path.join(path_to_parameters, path), map_location='cpu')
+				params_tmp = torch.load(os.path.join(path_to_parameters, path), map_location='cpu', weights_only=True)
 				loss = params_tmp['evaluation_loss']['aggregate'] or params_tmp['testing_loss']['aggregate']
 				if testing_loss > loss:
 					testing_loss = loss
@@ -52,7 +52,7 @@ def loadModel(Model: type[torch.nn.Module], path_to_parameters: str, url: str | 
 		# could change this to `pip install wget` if this doesn't work on all os
 		subprocess.run(shlex.split(f'curl {url} -L --output {path_to_parameters}'))
 	# load parameters
-	params: ExportedModel = torch.load(path_to_parameters, map_location='cpu')
+	params: ExportedModel = torch.load(path_to_parameters, map_location='cpu', weights_only=True)
 	assert params['run_info']['model'] is not None and params['run_info']['model']['name'] == Model.__name__, \
 		'The parameters you have loaded do not match the model you have provided.'
 	# load model

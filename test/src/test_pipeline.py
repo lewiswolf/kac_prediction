@@ -3,6 +3,7 @@ import requests
 import os
 from typing import get_args
 from unittest import TestCase
+import warnings
 
 # dependencies
 import torch	# pytorch
@@ -175,7 +176,7 @@ class PipelineTests(TestCase):
 
 		# This test asserts the training routine correctly exported a model checkpoint.
 		self.assertTrue(os.path.isfile(f'{routine.R["exports_dir"]}/epoch_000.pt'))
-		checkpoint = torch.load(f'{routine.R["exports_dir"]}/epoch_000.pt')
+		checkpoint = torch.load(f'{routine.R["exports_dir"]}/epoch_000.pt', weights_only=True)
 		# These test asserts that exported model has the correct metadata.
 		self.assertEqual(checkpoint['dataset']['dataset_size'], 200)
 		self.assertEqual(checkpoint['dataset']['sampler']['name'], 'TestTone')
@@ -205,16 +206,24 @@ class PipelineTests(TestCase):
 		'''
 		Tests used with pipeline/routines using a wandb run.
 		'''
-		# Run a training routine.
-		with withoutPrinting():
-			routine = Routine(
-				exports_dir='',
-				wandb_config={
-					'entity': 'lewiswolf',
-					'project': 'liltester',
-				},
-			)
-			wandb.finish()
 
-		# This test asserts that the model directory exists.
-		self.assertTrue(os.path.isdir(routine.R['exports_dir']))
+		if (wandb.api.api_key is not None):
+			# Run a training routine.
+			with withoutPrinting():
+				routine = Routine(
+					exports_dir='',
+					wandb_config={
+						'entity': 'lewiswolf',
+						'project': 'liltester',
+					},
+				)
+				wandb.finish()
+
+			# This test asserts that the model directory exists.
+			self.assertTrue(os.path.isdir(routine.R['exports_dir']))
+		else:
+			print()
+			warnings.warn(
+				'Tests including the Weights & Biases API were not completed. Please run wandb.login() to complete these tests.',
+				UserWarning,
+			)
