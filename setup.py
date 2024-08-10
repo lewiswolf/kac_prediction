@@ -62,7 +62,8 @@ setup(
 	long_description=long_description,
 	long_description_content_type='text/markdown',
 	name=name,
-	packages=find_packages(),
+	package_dir={'kac_prediction': 'kac_prediction'},
 	package_data={'kac_prediction': ['py.typed']},
+	packages=find_packages(),
 	version=version,
 )
