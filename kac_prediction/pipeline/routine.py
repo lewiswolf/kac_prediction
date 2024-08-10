@@ -122,7 +122,7 @@ class Routine:
 		dataset_dir: str,
 		dataset_name: Datasets | Literal[''] = '',
 		LocalSampler: type[AudioSampler] | None = None,
-		representation_settings: RepresentationSettings | None = None,
+		representation_settings: RepresentationSettings = {},
 		sampler_settings: SamplerSettings = {'duration': 1., 'sample_rate': 48000},
 	) -> None:
 		'''
@@ -130,7 +130,6 @@ class Routine:
 		that dataset is loaded and transformed if necessary. If the project is run in evaluation mode, the official dataset
 		is downloaded using the zenodo script in /bin. Else a small local dataset is generated for testing.
 		'''
-		representation_settings = {} if representation_settings is None else representation_settings
 		# load a dataset normally
 		try:
 			dataset = transformDataset(loadDataset(dataset_dir=dataset_dir), representation_settings)
