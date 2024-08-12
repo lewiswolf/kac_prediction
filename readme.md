@@ -244,10 +244,10 @@ from kac_prediction.dataset import (
 ```python
 def generateDataset(
 	Sampler: Type[AudioSampler],
-	sampler_settings: SamplerSettings,
 	dataset_dir: str,
 	dataset_size: int = 10,
-	representation_settings: RepresentationSettings | None = None,
+	representation_settings: RepresentationSettings = {},
+	sampler_settings: SamplerSettings = {'duration': 1., 'sample_rate': 48000},
 ) -> TorchDataset:
 	'''
 	Generates a dataset of audio samples. The generated dataset, including the individual .wav files and the metadata.json,
@@ -321,7 +321,7 @@ class InputRepresentation():
 
 	settings: RepresentationSettings
 
-	def __init__(self, sample_rate: int, settings: RepresentationSettings | None = None) -> None:
+	def __init__(self, sample_rate: int, settings: RepresentationSettings = {}) -> None:
 		'''
 		InputRepresentation works by creating a variably defined method self.transform. This method uses the input settings to
 		generate the correct input representation of the data.
@@ -503,7 +503,7 @@ conda activate kac
 ### Install
 
 ```bash
-pipenv install -d
+pipenv install -d && pipenv run build
 ```
 
 ### Training Commands

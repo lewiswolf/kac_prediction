@@ -93,8 +93,12 @@ class Routine:
 		# set device
 		if torch.cuda.is_available():
 			self.device = torch.device('cuda')
+		# elif torch.backends.mps.is_available():
+		# 	printEmojis('😓 WARNING 😓 Running on Apple Silicon GPU using torch.float32.')
+		# 	self.device = torch.device('mps')
+		# 	torch.set_default_dtype(torch.float32)
 		else:
-			printEmojis('😓 WARNING 😓 Nvidia GPU support is not available for training the network.')
+			printEmojis('😓 WARNING 😓 GPU support is not available for training the network.')
 			self.device = torch.device('cpu')
 		# initialise weights and biases
 		self.using_wandb = wandb_config != {}

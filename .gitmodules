@@ -1,0 +1,4 @@
+[submodule "kac_drumset"]
+	path = kac_drumset
+	url = https://github.com/lewiswolf/kac_drumset
+	branch = local
