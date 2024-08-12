@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 numpy = ">=2.0"
-soundfile = "*"
+soundfile = ">=0.12"
 torch = ">=2.4"
 torchaudio = ">=2.4"
 tqdm = ">4.66"
