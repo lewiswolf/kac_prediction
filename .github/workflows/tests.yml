@@ -55,7 +55,7 @@ jobs:
             # pytorch is seperated to ensure it is installed for cpu usage only
             - name: Install PyTorch on Linux
               if: ${{ matrix.os == 'ubuntu-latest' }}
-              run: pipenv install torch --index-url https://download.pytorch.org/whl/cpu
+              run: pipenv run pip install torch --index-url https://download.pytorch.org/whl/cpu
 
             - name: Install python dependencies
               run: pipenv install -d
