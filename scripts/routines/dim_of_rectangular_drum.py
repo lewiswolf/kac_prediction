@@ -5,6 +5,7 @@ from typing import Any
 # dependencies
 from bokeh.embed import file_html	# convert plot to html
 from bokeh.layouts import Row		# horizontal plots
+from bokeh.models import Range1d	# range for plots
 from bokeh.plotting import figure	# plot a figure
 from bokeh.resources import CDN		# minified bokeh
 import numpy as np					# math
@@ -89,31 +90,31 @@ def DimOfRectangularDrum(config_path: str = '', wandb_config: dict[str, Any] = {
 			})
 		y_hat = routine.M(x)
 		routine.M.testing_loss['aggregate'] += routine.M.criterion(y, y_hat).item() / loop_length
-		routine.M.testing_loss['size'] += routine.M.criterion(y[0], y_hat[0]).item() / loop_length
 		routine.M.testing_loss['aspect_ratio'] += routine.M.criterion(y[1], y_hat[1]).item() / loop_length
+		routine.M.testing_loss['size'] += routine.M.criterion(y[0], y_hat[0]).item() / loop_length
 		# log to wandb
 		if routine.using_wandb and i == loop_length - 1:
 			# rectangle properties
 			y = y.detach().cpu().numpy()[0]
-			y_height = y[0] / (y[1] ** 0.5)
-			y_width = y[0] * (y[1] ** 0.5)
+			y_height = float(y[0] / (y[1] ** 0.5))
+			y_width = float(y[0] * (y[1] ** 0.5))
 			y_hat = np.abs(y_hat.detach().cpu().numpy()[0])
-			y_hat_height = y_hat[0] / (y_hat[1] ** 0.5)
-			y_hat_width = y_hat[0] * (y_hat[1] ** 0.5)
+			y_hat_height = float(y_hat[0] / (y_hat[1] ** 0.5))
+			y_hat_width = float(y_hat[0] * (y_hat[1] ** 0.5))
 			# plots
 			plot_settings: dict[str, Any] = {'height': 300, 'toolbar_location': None, 'width': 300}
 			max_dim = max(2., y_width / 2., y_height / 2.)
 			truth_fig = figure(
 				title='Ground Truth',
-				x_range=(max_dim * -1., max_dim),
-				y_range=(max_dim * -1., max_dim),
+				x_range=Range1d(max_dim * -1., max_dim),
+				y_range=Range1d(max_dim * -1., max_dim),
 				**plot_settings,
 			)
 			max_dim = max(2., y_hat_width / 2., y_hat_height / 2.)
 			pred_fig = figure(
 				title='Prediction',
-				x_range=(max_dim * -1., max_dim),
-				y_range=(max_dim * -1., max_dim),
+				x_range=Range1d(max_dim * -1., max_dim),
+				y_range=Range1d(max_dim * -1., max_dim),
 				**plot_settings,
 			)
 			truth_fig.title.text_font = truth_fig.axis.major_label_text_font = 'CMU serif' # type: ignore

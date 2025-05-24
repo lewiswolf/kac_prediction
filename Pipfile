@@ -4,12 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-numpy = ">=2.0"
-soundfile = ">=0.12"
-torch = ">=2.4"
-torchaudio = ">=2.4"
-tqdm = ">4.66"
-wandb = ">=0.17"
+numpy = ">=2.2"
+soundfile = ">=0.13"
+torchaudio = ">=2.7"
+tqdm = ">4.67"
+wandb = ">=0.19"
+torch = ">=2.7"
 
 [dev-packages]
 bokeh = "*"
