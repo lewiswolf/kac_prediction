@@ -48,14 +48,17 @@ jobs:
                   key: ${{ runner.os }}-python-${{ steps.setup-python.outputs.python-version }}-pipenv-${{ hashFiles('Pipfile.lock') }}
 
             - name: Install pipenv
-              run: python -m pip install --upgrade pip pipenv setuptools wheel
+              run: |
+                python -m pip install --upgrade pip pipenv setuptools wheel
+                pipenv --python ${{ matrix.python }}
 
             # pytorch is seperated to ensure it is installed for cpu usage only
+            - name: Install PyTorch on Linux
+              if: ${{ matrix.os == 'ubuntu-latest' }}
+              run: pipenv install torch --index-url https://download.pytorch.org/whl/cpu
+
             - name: Install python dependencies
-              run: |
-                pipenv --python ${{ matrix.python }}
-                pipenv install torch --extra-index-url https://download.pytorch.org/whl/cpu
-                pipenv install -d
+              run: pipenv install -d
 
             - name: Lint project 3.11
               if: ${{ matrix.python == '3.11' }}
