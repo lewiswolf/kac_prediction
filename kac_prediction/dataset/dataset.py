@@ -17,7 +17,7 @@ __all__ = [
 ]
 
 
-class TorchDataset(torch.utils.data.Dataset):
+class TorchDataset(torch.utils.data.Dataset[tuple[torch.Tensor, dict[str, torch.Tensor]]]):
 	''' PyTorch wrapper for a dataset. '''
 
 	dataset_dir: str									# dataset directory
