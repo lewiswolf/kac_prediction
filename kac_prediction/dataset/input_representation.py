@@ -5,7 +5,7 @@ file also includes other helper methods such as calculating the size of the inpu
 
 # core
 import math
-from typing import Any, Literal, TypedDict
+from typing import Callable, Literal, TypedDict
 
 # dependencies
 import numpy as np 				# maths
@@ -57,11 +57,8 @@ class InputRepresentation():
 			X[i] = IR.transform(waveform)
 	'''
 
-	# when using the correct types here, mypy throws an error.
-	# __normalise__: Callable[[npt.NDArray[np.float64]], npt.NDArray[np.float64]]
-	# transform: Callable[[Any, npt.NDArray[np.float64]], torch.Tensor]
-	__normalise__: Any
-	transform: Any
+	__normalise__: Callable[[npt.NDArray[np.float64]], npt.NDArray[np.float64]]
+	transform: Callable[[npt.NDArray[np.float64]], torch.Tensor]
 	settings: RepresentationSettings
 	transformer: torch.nn.Module
 
@@ -121,8 +118,8 @@ class InputRepresentation():
 	@staticmethod
 	def normalise(waveform: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
 		''' Normalise an audio waveform, such that x ∈ [-1.0, 1.0] '''
-		x_min = waveform.min()
-		x_max = waveform.max()
+		x_min: float = waveform.min()
+		x_max: float = waveform.max()
 		if x_max - x_min != 0.:
 			return 2. * (waveform - x_min) / (x_max - x_min) - 1.
 		else:
