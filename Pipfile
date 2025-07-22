@@ -4,11 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-numpy = ">=2.2"
+numpy = ">=2.3"
 soundfile = ">=0.13"
 torchaudio = ">=2.7"
 tqdm = ">4.67"
-wandb = ">=0.19"
+wandb = ">=0.21"
 torch = ">=2.7"
 
 [dev-packages]
