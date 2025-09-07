@@ -486,7 +486,7 @@ class TestTone(AudioSampler):
 ```
 </details>
 
-# Development / Local Training
+# Local Training
 
 ### Dependencies
 
@@ -539,6 +539,20 @@ pipenv run python scripts/deploy.py
 	options:
 	-h, --help			show this help message and exit
 	--url URL			url to a model parameter file
+```
+
+# Development 
+
+### Update Dependencies
+
+```bash
+pipenv update -d
+```
+
+To update `kac_drumset`, make sure the `kac_drumset.local` branch is first up to date.
+
+```bash
+git submodule update --remote
 ```
 
 ### Test Codebase
