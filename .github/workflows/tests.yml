@@ -8,6 +8,7 @@ on:
 
 env:
     CUDA_VISIBLE_DEVICES: ""
+    PYTORCH_ENABLE_MPS_FALLBACK: "1"  # prevents CUDA crash on macOS too
     TORCH_CUDA_ARCH_LIST: "Off"
     WANDB_MODE: offline
 
@@ -54,7 +55,11 @@ jobs:
                 python -m pip install --upgrade pip pipenv setuptools wheel
 
             - name: Install python dependencies
-              run: pipenv install -d --python ${{ matrix.python }}
+              run: |
+                pipenv install -d --python ${{ matrix.python }}
+                if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+                  pipenv run pip install torch --index-url https://download.pytorch.org/whl/cpu
+                fi
 
             - name: Lint project
               run: |
