@@ -58,7 +58,7 @@ jobs:
               run: |
                 pipenv install -d --python ${{ matrix.python }}
                 if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-                  pipenv run pip install torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+                  pipenv run pip install torch+cpu torchaudio+cpu --index-url https://download.pytorch.org/whl/cpu
                 fi
 
             - name: Lint project
