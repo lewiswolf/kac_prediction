@@ -7,6 +7,8 @@ on:
         branches: [master]
 
 env:
+    CUDA_VISIBLE_DEVICES: ""
+    TORCH_CUDA_ARCH_LIST: "Off"
     WANDB_MODE: offline
 
 jobs:
