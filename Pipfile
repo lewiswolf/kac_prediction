@@ -27,7 +27,7 @@ types-setuptools = "*"
 types-tqdm = "*"
 
 [requires]
-python_version = "3.11"
+python_version = "3.14"
 
 [scripts]
 build = "python ./kac_drumset/setup.py develop"

@@ -1,6 +1,7 @@
 # core
 import requests
 import os
+import time
 from typing import get_args
 from unittest import TestCase
 import warnings
@@ -43,9 +44,21 @@ class PipelineTests(TestCase):
 		Tests used for dataset io.
 		'''
 
-		# This test asserts that all of the dataset endpoints in  bin/install-dataset.sh exist.
+		# This test asserts that all of the dataset endpoints in bin/install-dataset.sh exist.
 		for endpoint in get_args(Datasets):
-			self.assertLess(requests.head(f'https://zenodo.org/record/7274474/files/{endpoint}.zip?download=0').status_code, 400)
+			status_code = requests.head(
+				f'https://zenodo.org/records/7274474/files/{endpoint}.zip?download=0',
+				timeout=10,
+			).status_code
+			if status_code != 429:
+				self.assertEqual(status_code, 200)
+			else:
+				print()
+				warnings.warn(
+					'The dataset server has received too many requests. Due to rate limiting, the result of this test is undefined.',
+					UserWarning,
+				)
+			time.sleep(1.5)
 
 	def test_local_routine(self) -> None:
 		'''

@@ -47,7 +47,7 @@ cd data
 	done
 
 	# download the dataset from zenodo
-	curl --cookie ${token_file} "https://zenodo.org/record/7274474/files/${dataset}.zip?download=1" --output ${dataset}.zip
+	curl --cookie ${token_file} "https://zenodo.org/records/7274474/files/${dataset}.zip?download=1" --output ${dataset}.zip
 
 	# unzip and copy contents to /data
 	echo "Organising files..."
