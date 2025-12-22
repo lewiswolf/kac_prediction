@@ -55,7 +55,8 @@ class PipelineTests(TestCase):
 			else:
 				print()
 				warnings.warn(
-					'The dataset server has received too many requests. Due to rate limiting, the result of this test is undefined.',
+					'The Zenodo dataset server has received too many requests. ' +
+					f'Due to rate limiting, the availability of dataset {endpoint} is undefined.',
 					UserWarning,
 				)
 			time.sleep(1.5)

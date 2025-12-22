@@ -20,6 +20,7 @@ kac-drumset = {file = "kac_drumset", editable = true}
 kac-prediction = {file = ".", editable = true}
 mypy = "*"
 requests = "*"
+safety = "*"
 scikit-build = "*"
 types-pyyaml = "*"
 types-requests = "*"
@@ -27,7 +28,7 @@ types-setuptools = "*"
 types-tqdm = "*"
 
 [requires]
-python_version = "3.14"
+python_version = "3.13"
 
 [scripts]
 build = "python ./kac_drumset/setup.py develop"
