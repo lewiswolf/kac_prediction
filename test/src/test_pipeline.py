@@ -43,9 +43,27 @@ class PipelineTests(TestCase):
 		Tests used for dataset io.
 		'''
 
-		# This test asserts that all of the dataset endpoints in  bin/install-dataset.sh exist.
+		# This test asserts that all of the dataset endpoints in bin/install-dataset.sh exist.
 		for endpoint in get_args(Datasets):
-			self.assertLess(requests.head(f'https://zenodo.org/record/7274474/files/{endpoint}.zip?download=0').status_code, 400)
+			try:
+				r = requests.head(
+					f'https://zenodo.org/records/7274474/files/{endpoint}.zip',
+					timeout=5,
+				)
+				if r.status_code == 429:
+					print()
+					warnings.warn(
+						f'The Zenodo dataset server is rate limiting, and the availability of {endpoint} is undefined.',
+						UserWarning,
+					)
+				else:
+					self.assertEqual(r.status_code, 200)
+			except requests.RequestException:
+				print()
+				warnings.warn(
+					f'The Zenodo dataset server has timed out, and the availability of {endpoint} is undefined.',
+					UserWarning,
+				)
 
 	def test_local_routine(self) -> None:
 		'''
