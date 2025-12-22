@@ -1,7 +1,6 @@
 # core
 import requests
 import os
-import time
 from typing import get_args
 from unittest import TestCase
 import warnings
@@ -51,20 +50,20 @@ class PipelineTests(TestCase):
 					f'https://zenodo.org/records/7274474/files/{endpoint}.zip',
 					timeout=5,
 				)
+				if r.status_code == 429:
+					print()
+					warnings.warn(
+						f'The Zenodo dataset server is rate limiting, and the availability of {endpoint} is undefined.',
+						UserWarning,
+					)
+				else:
+					self.assertEqual(r.status_code, 200)
 			except requests.RequestException:
 				print()
 				warnings.warn(
 					f'The Zenodo dataset server has timed out, and the availability of {endpoint} is undefined.',
 					UserWarning,
 				)
-			if r.status_code == 429:
-				print()
-				warnings.warn(
-					f'The Zenodo dataset server is rate limiting, and the availability of {endpoint} is undefined.',
-					UserWarning,
-				)
-			else:
-				self.assertEqual(r.status_code, 200)
 
 	def test_local_routine(self) -> None:
 		'''
