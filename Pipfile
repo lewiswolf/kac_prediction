@@ -3,35 +3,28 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
-[packages]
-numpy = ">=2.3"
-soundfile = ">=0.13"
-torch = ">=2.9"
-torchaudio = ">=2.9"
-tqdm = ">4.67"
-wandb = ">=0.23"
-
 [dev-packages]
 bokeh = "*"
 flake8 = "*"
 flake8-commas = "*"
+flake8-pyproject = "*"
 flake8-quotes = "*"
-kac-drumset = {file = "kac_drumset", editable = true}
-kac-prediction = {file = ".", editable = true}
+kac_drumset = {file = "kac_drumset", editable = true}
+kac_prediction = {file = ".", editable = true}
 mypy = "*"
 requests = "*"
 safety = "*"
 scikit-build = "*"
 types-pyyaml = "*"
 types-requests = "*"
-types-setuptools = "*"
 types-tqdm = "*"
 
 [requires]
 python_version = "3.13"
 
 [scripts]
-build = "python ./kac_drumset/setup.py develop"
+audit = "safety scan"
+build = "sh ./kac_drumset/bin/build.sh"
 deploy = "python ./scripts/deploy.py"
 train = "python ./scripts/train.py"
 test = "sh ./test/test.sh"
