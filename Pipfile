@@ -9,8 +9,8 @@ flake8 = "*"
 flake8-commas = "*"
 flake8-pyproject = "*"
 flake8-quotes = "*"
-kac_drumset = {file = "kac_drumset", editable = true}
-kac_prediction = {file = ".", editable = true}
+kac-drumset = {file = "kac_drumset", editable = true}
+kac-prediction = {file = ".", editable = true}
 mypy = "*"
 requests = "*"
 safety = "*"
