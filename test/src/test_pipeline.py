@@ -50,7 +50,7 @@ class PipelineTests(TestCase):
 					f'https://zenodo.org/records/7274474/files/{endpoint}.zip',
 					timeout=5,
 				)
-				if r.status_code == 429:
+				if r.status_code == 429 or r.status_code == 403:
 					print()
 					warnings.warn(
 						f'The Zenodo dataset server is rate limiting, and the availability of {endpoint} is undefined.',

@@ -15,21 +15,22 @@ classifiers = [
 	"Programming Language :: Python :: 3.11",
 	"Programming Language :: Python :: 3.12",
 	"Programming Language :: Python :: 3.13",
+	"Programming Language :: Python :: 3.14",
 	"Typing :: Typed",
 ]
 
 requires-python = ">=3.11"
 dependencies = [
-	"numpy>=2.3",
+	"numpy>=2.4",
 	"soundfile>=0.13",
-	"torch>=2.9",
-	"torchaudio>=2.9",
+	"torch>=2.10",
+	"torchaudio>=2.10",
 	"tqdm>4.67",
-	"wandb>=0.23"
+	"wandb>=0.24"
 ]
 
 [build-system]
-requires = ["setuptools>=65.0", "wheel"]
+requires = ["setuptools>=80.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
