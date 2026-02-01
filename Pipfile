@@ -13,7 +13,7 @@ kac-drumset = {file = "kac_drumset", editable = true}
 kac-prediction = {file = ".", editable = true}
 mypy = "*"
 requests = "*"
-safety = "*"
+pip-audit = "*"
 scikit-build = "*"
 types-pyyaml = "*"
 types-requests = "*"
@@ -23,7 +23,6 @@ types-tqdm = "*"
 python_version = "3.14"
 
 [scripts]
-audit = "safety scan"
 build = "sh ./kac_drumset/bin/build.sh"
 deploy = "python ./scripts/deploy.py"
 train = "python ./scripts/train.py"
