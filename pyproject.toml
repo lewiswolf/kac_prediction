@@ -21,12 +21,12 @@ classifiers = [
 
 requires-python = ">=3.11"
 dependencies = [
-	"numpy>=2.4",
-	"soundfile>=0.13",
-	"torch>=2.10",
-	"torchaudio>=2.10",
-	"tqdm>4.67",
-	"wandb>=0.24"
+	"numpy>=2.5",
+	"soundfile>=0.14",
+	"torch>=2.14",
+	"torchaudio>=2.11",
+	"tqdm>4.70",
+	"wandb>=0.30"
 ]
 
 [build-system]

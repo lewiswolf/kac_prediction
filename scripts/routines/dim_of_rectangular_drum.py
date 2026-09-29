@@ -106,15 +106,15 @@ def DimOfRectangularDrum(config_path: str = '', wandb_config: dict[str, Any] = {
 			max_dim = max(2., y_width / 2., y_height / 2.)
 			truth_fig = figure(
 				title='Ground Truth',
-				x_range=Range1d(max_dim * -1., max_dim),
-				y_range=Range1d(max_dim * -1., max_dim),
+				x_range=Range1d(start=-max_dim, end=max_dim),
+				y_range=Range1d(start=-max_dim, end=max_dim),
 				**plot_settings,
 			)
 			max_dim = max(2., y_hat_width / 2., y_hat_height / 2.)
 			pred_fig = figure(
 				title='Prediction',
-				x_range=Range1d(max_dim * -1., max_dim),
-				y_range=Range1d(max_dim * -1., max_dim),
+				x_range=Range1d(start=-max_dim, end=max_dim),
+				y_range=Range1d(start=-max_dim, end=max_dim),
 				**plot_settings,
 			)
 			truth_fig.title.text_font = truth_fig.axis.major_label_text_font = 'CMU serif' # type: ignore
