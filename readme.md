@@ -1,6 +1,6 @@
 # kac_prediction
 
-![python version](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue)
+![python version](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue)
 
 Deep learning toolkit for orchestrating and arranging arbitrarily shaped drums.
 
