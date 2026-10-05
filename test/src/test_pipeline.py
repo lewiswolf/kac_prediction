@@ -47,7 +47,7 @@ class PipelineTests(TestCase):
 		for endpoint in get_args(Datasets):
 			try:
 				r = requests.head(
-					f'https://zenodo.org/records/7274474/files/{endpoint}.zip',
+					f'https://zenodo.org/records/23148121/files/{endpoint}.zip',
 					timeout=5,
 				)
 				if r.status_code == 429 or r.status_code == 403:
