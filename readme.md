@@ -590,7 +590,7 @@ pipenv run test
   doi = {10.5281/zenodo.23148121},
   howpublished = {Zenodo},
   type = {dataset},
-  note = {{{Version: 2.0}}}
+  note = {{{Version: 2.0}}},
   copyright = {All rights reserved}
 }
 ```
