@@ -511,7 +511,11 @@ pipenv install -d && pipenv run build
 Import one of the official datasets used as part of this project.
 
 ```bash
-sh ./bin/install-dataset.sh 2000-convex-polygonal-drums-of-varying-size
+sh ./bin/install-dataset.sh 2000-convex-polygon-drums-of-varying-area
+sh ./bin/install-dataset.sh 2000-elliptic-drums-of-varying-area
+sh ./bin/install-dataset.sh 2000-irregular-star-drums-of-varying-area
+sh ./bin/install-dataset.sh 2000-regular-star-drums-of-varying-area
+sh ./bin/install-dataset.sh 2000-simple-polygon-drums-of-varying-area
 sh ./bin/install-dataset.sh 5000-circular-drums-of-varying-size
 sh ./bin/install-dataset.sh 5000-rectangular-drums-of-varying-dimension
 ```
@@ -569,20 +573,24 @@ pipenv run test
   title = {Towards Orchestrating Physically Modelled {{2D}} Percussion Instruments},
   booktitle = {10th {{Convention}} of the {{European Acoustics Association}} ({{Forum Acusticum}})},
   author = {Wolstanholme, Lewis and McPherson, Andrew},
-  year = {2023},
+  year = 2023,
   month = sep,
   pages = {2193--2200},
-  publisher = {{European Acoustics Association}},
-  address = {{Turin, Italy}},
+  publisher = {European Acoustics Association},
+  address = {Turin, Italy},
   doi = {10.61782/fa.2023.0664},
+  copyright = {All rights reserved}
 }
 
-@misc{wolstanholmeKac_drumsetDatasetGenerator2022,
+@misc{wolstanholmeKac_drumsetDatasetGenerator2026,
   title = {{{kac\_drumset}}: {{A}} Dataset Generator for Arbitrarily Shaped Drums},
   author = {Wolstanholme, Lewis},
-  year = {2022},
-  month = nov,
-  publisher = {{Zenodo}},
-  doi = {10.5281/zenodo.7057219},
+  year = 2026,
+  month = oct,
+  doi = {10.5281/zenodo.23148121},
+  howpublished = {Zenodo},
+  type = {dataset},
+  note = {{{Version: 2.0}}}
+  copyright = {All rights reserved}
 }
 ```
